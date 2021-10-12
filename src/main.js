@@ -6,9 +6,11 @@ import { createTripList } from './view/trip-list.js';
 import { createPoint } from './view/point.js';
 import { createNewPoint } from './view/new-point.js';
 import { createPointEdit } from './view/point-edit.js';
-// import {generatePoint} from './mock/point.js';
+import {generatePoint} from './mock/point.js';
 
-const TRIP_COUNT = 3;
+const POINT_COUNT = 15;
+
+const points = new Array(POINT_COUNT).fill(null).map(generatePoint);
 
 const pageHeader = document.querySelector('.page-header');
 const tripMain = pageHeader.querySelector('.trip-main');
@@ -32,6 +34,6 @@ const tripEventList = pageMain.querySelector('.trip-events__list');
 render(tripEventList, createPointEdit(), 'beforeend');
 render(tripEventList, createNewPoint(), 'beforeend');
 
-for (let i = 0; i < TRIP_COUNT; i ++) {
-  render(tripEventList, createPoint(), 'beforeend');
+for (let i = 0; i < POINT_COUNT; i ++) {
+  render(tripEventList, createPoint(points[i]), 'beforeend');
 }
