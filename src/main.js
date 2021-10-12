@@ -6,6 +6,7 @@ import { createTripList } from './view/trip-list.js';
 import { createPoint } from './view/point.js';
 import { createNewPoint } from './view/new-point.js';
 import { createPointEdit } from './view/point-edit.js';
+// import {generatePoint} from './mock/point.js';
 
 const TRIP_COUNT = 3;
 
