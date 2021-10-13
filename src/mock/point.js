@@ -32,7 +32,7 @@ const offerTitle = [
   'Lunch in city',
 ];
 
-const MAX_PRICE = 2000;
+const MAX_PRICE = 1500;
 const MAX_OFFER_PRICE = 100;
 const maxDescriptionCount = 5;
 

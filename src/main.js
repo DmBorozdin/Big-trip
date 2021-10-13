@@ -3,7 +3,7 @@ import { createRouteAndPrice } from './view/route-and-price.js';
 import { createFilter } from './view/filter.js';
 import { createSort } from './view/sort.js';
 import { createTripList } from './view/trip-list.js';
-import { createPoint } from './view/point.js';
+import { createPointTemplate } from './view/point.js';
 import { createNewPoint } from './view/new-point.js';
 import { createPointEdit } from './view/point-edit.js';
 import {generatePoint} from './mock/point.js';
@@ -35,5 +35,5 @@ render(tripEventList, createPointEdit(), 'beforeend');
 render(tripEventList, createNewPoint(), 'beforeend');
 
 for (let i = 0; i < POINT_COUNT; i ++) {
-  render(tripEventList, createPoint(points[i]), 'beforeend');
+  render(tripEventList, createPointTemplate(points[i]), 'beforeend');
 }
