@@ -37,6 +37,7 @@ export const createPointTemplate = (point) => {
   const {type, town, dateFrom, dateTo, price, isFavorite, offers} = point;
 
   const date = dayjs(dateFrom).format('MMM D');
+  const dateFullFormat = dayjs(dateFrom).format('YYYY-MM-DD');
   const dateFromHour = dayjs(dateFrom).format('HH:mm');
   const dateToHour = dayjs(dateTo).format('HH:mm');
   const difference = calculateDifference(dateTo, dateFrom);
@@ -47,7 +48,7 @@ export const createPointTemplate = (point) => {
 
   return `<li class="trip-events__item">
     <div class="event">
-      <time class="event__date" datetime="2019-03-18">${date}</time>
+      <time class="event__date" datetime=${dateFullFormat}>${date}</time>
       <div class="event__type">
         <img class="event__type-icon" width="42" height="42" src="img/icons/${type.toLowerCase()}.png" alt="Event type icon">
       </div>

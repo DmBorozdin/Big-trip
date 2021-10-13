@@ -83,7 +83,7 @@ const generateDescription = () => {
   const descriptionArray = descriptionStub.split('. ');
   const descriptionCount = getRandomInteger(1, maxDescriptionCount);
 
-  return getNewRandomArray(descriptionArray, descriptionCount);
+  return getNewRandomArray(descriptionArray, descriptionCount).join('. ');
 };
 
 const generateOffer = () => {
