@@ -1,6 +1,6 @@
 import { createMenu } from './view/menu.js';
 import { createRouteAndPrice } from './view/route-and-price.js';
-import { createFilter } from './view/filter.js';
+import { createFilterTemplate } from './view/filter.js';
 import { createSort } from './view/sort.js';
 import { createTripList } from './view/trip-list.js';
 import { createPointTemplate } from './view/point.js';
@@ -25,7 +25,7 @@ const render = (container, template, place) => {
 
 render(tripNavigation, createMenu(), 'beforeend');
 render(tripMain, createRouteAndPrice(), 'afterbegin');
-render(tripFilter, createFilter(), 'beforeend');
+render(tripFilter, createFilterTemplate(), 'beforeend');
 render(tripEvent, createSort(), 'beforeend');
 render(tripEvent, createTripList(), 'beforeend');
 
