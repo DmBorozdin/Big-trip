@@ -68,22 +68,22 @@ const generateDate = () => {
 
 const generatePicture = () => {
   const maxPictureCount = 5;
-  const minPictureCount = 1;
+  const minPictureCount = 0;
   const pictureCount = getRandomInteger(minPictureCount, maxPictureCount);
-  const pictures = new Array(pictureCount).fill(null).map(() => {
+  const pictures = pictureCount !==0 ? new Array(pictureCount).fill(null).map(() => {
     const maxPictureNumber = 100;
     const pictureNumber = getRandomInteger(0, maxPictureNumber);
     return `http://picsum.photos/248/152?r=${pictureNumber}`;
-  });
+  }) : [];
   return pictures;
 };
 
 const generateDescription = () => {
   const descriptionStub = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras aliquet varius magna, non porta ligula feugiat eget. Fusce tristique felis at fermentum pharetra. Aliquam id orci ut lectus varius viverra. Nullam nunc ex, convallis sed finibus eget, sollicitudin eget ante. Phasellus eros mauris, condimentum sed nibh vitae, sodales efficitur ipsum. Sed blandit, eros vel aliquam faucibus, purus ex euismod diam, eu luctus nunc ante ut dui. Sed sed nisi sed augue convallis suscipit in sed felis. Aliquam erat volutpat. Nunc fermentum tortor ac porta dapibus. In rutrum ac purus sit amet tempus';
   const descriptionArray = descriptionStub.split('. ');
-  const descriptionCount = getRandomInteger(1, maxDescriptionCount);
+  const descriptionCount = getRandomInteger(0, maxDescriptionCount);
 
-  return getNewRandomArray(descriptionArray, descriptionCount).join('. ');
+  return descriptionCount !== 0 ? getNewRandomArray(descriptionArray, descriptionCount).join('. ') : '';
 };
 
 const generateOffer = () => {

@@ -1,8 +1,8 @@
-import { createMenu } from './view/menu.js';
+import { createMenuTemplate } from './view/menu.js';
 import { createRouteAndPrice } from './view/route-and-price.js';
 import { createFilterTemplate } from './view/filter.js';
 import { createSort } from './view/sort.js';
-import { createTripList } from './view/trip-list.js';
+import { createTripListTemplate } from './view/trip-list.js';
 import { createPointTemplate } from './view/point.js';
 // import { createNewPoint } from './view/new-point.js';
 import { createPointEditTemplate } from './view/point-edit.js';
@@ -23,11 +23,11 @@ const render = (container, template, place) => {
   container.insertAdjacentHTML(place, template);
 };
 
-render(tripNavigation, createMenu(), 'beforeend');
+render(tripNavigation, createMenuTemplate(), 'beforeend');
 render(tripMain, createRouteAndPrice(), 'afterbegin');
 render(tripFilter, createFilterTemplate(), 'beforeend');
 render(tripEvent, createSort(), 'beforeend');
-render(tripEvent, createTripList(), 'beforeend');
+render(tripEvent, createTripListTemplate(), 'beforeend');
 
 const tripEventList = pageMain.querySelector('.trip-events__list');
 

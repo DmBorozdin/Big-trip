@@ -56,6 +56,17 @@ const createPointEditOfferTemplate = (offers) => offers.length !==0 ? `<section 
   </div>
 </section>` : '';
 
+const createPointEditDestinationTemplate = ({description, pictures}) => (description !== '' || pictures.length !== 0) ? `<section class="event__section  event__section--destination">
+<h3 class="event__section-title  event__section-title--destination">Destination</h3>
+${description !== '' ? `<p class="event__destination-description">${description}</p>` : ''}
+
+${pictures.length !== 0 ? `<div class="event__photos-container">
+<div class="event__photos-tape">
+  ${pictures.map((picture) => `<img class="event__photo" src="${picture}" alt="Event photo">`).join('')}
+</div>
+</div>` : ''}
+</section>` : '';
+
 export const createPointEditTemplate = (point = {}) => {
   const {
     type = 'flight',
@@ -76,6 +87,7 @@ export const createPointEditTemplate = (point = {}) => {
   const typeListTemplate = createPointEditTypeListTemplate(type);
   const destinationListTemplate = createPointEditDestinationListTemplate();
   const offerTemplate = createPointEditOfferTemplate(offers);
+  const destinationTemplate = createPointEditDestinationTemplate(destination);
 
   return `<li class="trip-events__item">
     <form class="event event--edit" action="#" method="post">
@@ -121,11 +133,7 @@ export const createPointEditTemplate = (point = {}) => {
       </header>
       <section class="event__details">
         ${offerTemplate}
-
-        <section class="event__section  event__section--destination">
-          <h3 class="event__section-title  event__section-title--destination">Destination</h3>
-          <p class="event__destination-description">${destination.description}</p>
-        </section>
+        ${destinationTemplate}
       </section>
     </form>
     </li>`;
