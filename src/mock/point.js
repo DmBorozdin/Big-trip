@@ -1,36 +1,6 @@
 import dayjs from 'dayjs';
 
-const types = [
-  'taxi',
-  'bus',
-  'train',
-  'ship',
-  'transport',
-  'drive',
-  'flight',
-  'check-in',
-  'sightseeing',
-  'restaurant',
-];
-
-const towns = [
-  'Amsterdam',
-  'Chamonix',
-  'Geneva',
-];
-
-const offerTitle = [
-  'Add luggage',
-  'Switch to comfort class',
-  'Add meal',
-  'Choose seats',
-  'Travel by train',
-  'Order Uber',
-  'Rent a car',
-  'Add breakfast',
-  'Book tickets',
-  'Lunch in city',
-];
+import {TOWNS, TYPES, OFFER_TITLE} from '../const.js';
 
 const MAX_PRICE = 1500;
 const MAX_OFFER_PRICE = 100;
@@ -91,7 +61,7 @@ const generateOffer = () => {
   const offerCount = getRandomInteger(0, maxOfferCount);
   const offers = new Array(offerCount).fill(null).map(() => {
     const offer = {
-      title: getRandomArrayElement(offerTitle),
+      title: getRandomArrayElement(OFFER_TITLE),
       price: getRandomInteger(0, MAX_OFFER_PRICE),
     };
     return offer;
@@ -104,8 +74,8 @@ export const generatePoint = () => {
   const [dateFrom, dateTo] = generateDate();
 
   return {
-    type: getRandomArrayElement(types),
-    town: getRandomArrayElement(towns),
+    type: getRandomArrayElement(TYPES),
+    town: getRandomArrayElement(TOWNS),
     offers: generateOffer(),
     destination: {
       description: generateDescription(),

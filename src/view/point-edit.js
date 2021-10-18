@@ -1,23 +1,10 @@
-import dayjs from 'dayjs';
+import { getDateInFullFormat } from '../util.js';
+import { TYPES, TOWNS } from '../const.js';
 
-const createPointEditTypeListTemplate = (currentType) => {
-  const types = [
-    'taxi',
-    'bus',
-    'train',
-    'ship',
-    'transport',
-    'drive',
-    'flight',
-    'check-in',
-    'sightseeing',
-    'restaurant',
-  ];
-
-  return `<div class="event__type-list">
+const createPointEditTypeListTemplate = (currentType) => `<div class="event__type-list">
       <fieldset class="event__type-group">
         <legend class="visually-hidden">Event type</legend>
-        ${types.map((type) => `<div class="event__type-item">
+        ${TYPES.map((type) => `<div class="event__type-item">
           <input
             id="event-type-${type}-1"
             class="event__type-input
@@ -31,15 +18,10 @@ const createPointEditTypeListTemplate = (currentType) => {
         </div>`).join('')}
       </fieldset>
     </div>`;
-};
 
-const createPointEditDestinationListTemplate = () => {
-  const towns = ['Amsterdam', 'Chamonix', 'Geneva'];
-
-  return `<datalist id="destination-list-1">
-      ${towns.map((town) => `<option value="${town}"></option>`).join('')}
+const createPointEditDestinationListTemplate = () =>  `<datalist id="destination-list-1">
+      ${TOWNS.map((town) => `<option value="${town}"></option>`).join('')}
     </datalist>`;
-};
 
 const createPointEditOfferTemplate = (offers) => offers.length !==0 ? `<section class="event__section  event__section--offers">
   <h3 class="event__section-title  event__section-title--offers">Offers</h3>
@@ -81,8 +63,8 @@ export const createPointEditTemplate = (point = {}) => {
     },
   } = point;
 
-  const dateFromFormat = dayjs(dateFrom).format('DD/MM/YY HH:mm');
-  const dateToFormat = dayjs(dateTo).format('DD/MM/YY HH:mm');
+  const dateFromFormat = getDateInFullFormat(dateFrom);
+  const dateToFormat = getDateInFullFormat(dateTo);
 
   const typeListTemplate = createPointEditTypeListTemplate(type);
   const destinationListTemplate = createPointEditDestinationListTemplate();

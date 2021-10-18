@@ -1,28 +1,4 @@
-import dayjs from 'dayjs';
-
-const MINUTE_IN_HOUR = 60;
-const MINUTE_IN_DAY = 1440;
-
-const calculateDifference = (dateTo, dateFrom) => {
-  const differenceInMinute = dayjs(dateTo).diff(dayjs(dateFrom), 'm');
-  let difference = differenceInMinute;
-  if (differenceInMinute < MINUTE_IN_HOUR) {
-    difference = `${differenceInMinute}M`;
-  } else if (differenceInMinute < MINUTE_IN_DAY) {
-    const differenceInHour = dayjs(dateTo).diff(dayjs(dateFrom), 'h');
-    const leftDifferenceInMinute = differenceInMinute - differenceInHour*MINUTE_IN_HOUR;
-    difference = differenceInHour < 10 ? `0${differenceInHour}H` : `${differenceInHour}H`;
-    difference = leftDifferenceInMinute < 10 ? `${difference} 0${leftDifferenceInMinute}M` : `${difference} ${leftDifferenceInMinute}M`;
-  } else {
-    const differenceInDay = dayjs(dateTo).diff(dayjs(dateFrom), 'd');
-    const leftDifferenceInHour =Math.floor((differenceInMinute - differenceInDay*MINUTE_IN_DAY)/MINUTE_IN_HOUR);
-    const leftDifferenceInMinute = differenceInMinute - differenceInDay*MINUTE_IN_DAY - leftDifferenceInHour*MINUTE_IN_HOUR;
-    difference = differenceInDay < 10 ? `0${differenceInDay}D` : `${differenceInDay}D`;
-    difference = leftDifferenceInHour < 10 ? `${difference} 0${leftDifferenceInHour}H` : `${difference} ${leftDifferenceInHour}H`;
-    difference = leftDifferenceInMinute < 10 ? `${difference} 0${leftDifferenceInMinute}M` : `${difference} ${leftDifferenceInMinute}M`;
-  }
-  return difference;
-};
+import { getDateInFormatMD, getDateInFormatYMD, getDateInFormatHM, calculateDateDifference } from '../util.js';
 
 const createOfferPointTemplate = (offers) => offers.length !==0 ? `<ul class="event__selected-offers">
   ${offers.map(({title, price}) =>
@@ -36,11 +12,11 @@ const createOfferPointTemplate = (offers) => offers.length !==0 ? `<ul class="ev
 export const createPointTemplate = (point) => {
   const {type, town, dateFrom, dateTo, price, isFavorite, offers} = point;
 
-  const date = dayjs(dateFrom).format('MMM D');
-  const dateFullFormat = dayjs(dateFrom).format('YYYY-MM-DD');
-  const dateFromHour = dayjs(dateFrom).format('HH:mm');
-  const dateToHour = dayjs(dateTo).format('HH:mm');
-  const difference = calculateDifference(dateTo, dateFrom);
+  const date = getDateInFormatMD(dateFrom);
+  const dateFullFormat = getDateInFormatYMD(dateFrom);
+  const dateFromHour = getDateInFormatHM(dateFrom);
+  const dateToHour = getDateInFormatHM(dateTo);
+  const difference = calculateDateDifference(dateTo, dateFrom);
 
   const favoriteClassName = isFavorite ? 'event__favorite-btn--active' : '';
 
