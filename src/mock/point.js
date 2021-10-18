@@ -1,9 +1,8 @@
 import dayjs from 'dayjs';
 
-import {TOWNS, TYPES, OFFER_TITLE} from '../const.js';
+import {TOWNS, TYPES, OFFERS} from '../const.js';
 
 const MAX_PRICE = 1500;
-const MAX_OFFER_PRICE = 100;
 const maxDescriptionCount = 5;
 
 const getRandomInteger = (lower = 0, upper = 1) => {
@@ -56,27 +55,19 @@ const generateDescription = () => {
   return descriptionCount !== 0 ? getNewRandomArray(descriptionArray, descriptionCount).join('. ') : '';
 };
 
-const generateOffer = () => {
-  const maxOfferCount = 5;
-  const offerCount = getRandomInteger(0, maxOfferCount);
-  const offers = new Array(offerCount).fill(null).map(() => {
-    const offer = {
-      title: getRandomArrayElement(OFFER_TITLE),
-      price: getRandomInteger(0, MAX_OFFER_PRICE),
-    };
-    return offer;
-  });
-
-  return offers;
+const getOffer = (type) => {
+  const typeOffer = OFFERS.find((offer) => offer.type === type);
+  return typeOffer.offers;
 };
 
 export const generatePoint = () => {
   const [dateFrom, dateTo] = generateDate();
+  const type = getRandomArrayElement(TYPES);
 
   return {
-    type: getRandomArrayElement(TYPES),
+    type,
     town: getRandomArrayElement(TOWNS),
-    offers: generateOffer(),
+    offers: getOffer(type),
     destination: {
       description: generateDescription(),
       pictures: generatePicture(),

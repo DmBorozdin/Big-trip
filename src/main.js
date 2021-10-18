@@ -17,8 +17,6 @@ const POINT_COUNT = 10;
 const points = new Array(POINT_COUNT).fill(null).map(generatePoint);
 const daySortPoints = points.slice().sort((point1, point2) =>  isDay1AfterDay2(point1.dateFrom, point2.dateFrom));
 
-// console.log(generateFilter(points));
-
 const pageHeader = document.querySelector('.page-header');
 const tripMain = pageHeader.querySelector('.trip-main');
 const tripNavigation = pageHeader.querySelector('.trip-controls__navigation');

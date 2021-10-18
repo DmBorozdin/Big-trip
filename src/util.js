@@ -5,9 +5,9 @@ const MINUTE_IN_DAY = 1440;
 
 export const isDay1AfterDay2 = (day1, day2) => dayjs(day1).isAfter(day2) ? 1 : -1;
 
-export const isPointDateExpired = (date) => date === null ? false : dayjs(date).isBefore(dayjs());
+export const isPointDateExpired = (date) => date === null ? false : dayjs(date).isBefore(dayjs(), 'D') && !dayjs(date).isSame(dayjs(), 'D');
 
-export const isPointDateFuture = (date) => date === null ? false : dayjs(date).isAfter(dayjs());
+export const isPointDateFuture = (date) => date === null ? false : dayjs(date).isAfter(dayjs(), 'D') || dayjs(date).isSame(dayjs(), 'D');
 
 export const getDateInFormatHM = (date) => dayjs(date).format('HH:mm');
 
