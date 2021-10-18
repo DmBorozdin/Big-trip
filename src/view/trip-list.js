@@ -1,2 +1,2 @@
-export const createTripList = () => `<ul class="trip-events__list">
+export const createTripListTemplate = () => `<ul class="trip-events__list">
 </ul>`;
