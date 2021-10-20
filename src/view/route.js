@@ -1,8 +1,9 @@
 import { getDateInFormatDM } from '../util.js';
+import { createElement } from '../util.js';
 
 const TOWNS_COUNT = 3;
 
-export const createRouteTemplate = (points) => {
+const createRouteTemplate = (points) => {
   const firstDate = getDateInFormatDM(points[0].dateFrom);
   const lastDate = getDateInFormatDM(points[points.length - 1].dateFrom);
   const towns = Array.from(new Set(points.map((point) => point.town)));
@@ -15,3 +16,26 @@ export const createRouteTemplate = (points) => {
 </div>
 </section>`;
 };
+
+export default class Route {
+  constructor(points) {
+    this._points = points;
+    this._element = null;
+  }
+
+  getTemplate() {
+    return createRouteTemplate(this._points);
+  }
+
+  getElement() {
+    if (!this._element) {
+      this._element = createElement(this.getTemplate());
+    }
+
+    return this._element;
+  }
+
+  removeElement() {
+    this._element = null;
+  }
+}
