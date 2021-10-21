@@ -16,6 +16,34 @@ import { render, RenderPosition } from './util.js';
 
 const POINT_COUNT = 10;
 
+const renderPoint = (tripListElement, point) => {
+  const pointComponent = new PointView(point);
+  const pointEditComponent = new PointEditView(point);
+
+  const replacePointToForm = () => {
+    tripListElement.replaceChild(pointEditComponent.getElement(), pointComponent.getElement());
+  };
+
+  const replaceFormToPoint = () => {
+    tripListElement.replaceChild(pointComponent.getElement(), pointEditComponent.getElement());
+  };
+
+  pointComponent.getElement().querySelector('.event__rollup-btn').addEventListener('click', () => {
+    replacePointToForm();
+  });
+
+  pointEditComponent.getElement().querySelector('form').addEventListener('submit', (evt) => {
+    evt.preventDefault();
+    replaceFormToPoint();
+  });
+
+  pointEditComponent.getElement().querySelector('.event__rollup-btn').addEventListener('click', () => {
+    replaceFormToPoint();
+  });
+
+  render(tripListElement, pointComponent.getElement(), RenderPosition.BEFOREEND);
+};
+
 const points = new Array(POINT_COUNT).fill(null).map(generatePoint);
 const daySortPoints = points.slice().sort((point1, point2) =>  isDay1AfterDay2(point1.dateFrom, point2.dateFrom));
 
@@ -36,8 +64,7 @@ render(tripEvent, new SortView().getElement(), RenderPosition.BEFOREEND);
 const tripListComponent = new TripListView();
 render(tripEvent, tripListComponent.getElement(), RenderPosition.BEFOREEND);
 
-render(tripListComponent.getElement(), new PointEditView(daySortPoints[0]).getElement(), RenderPosition.BEFOREEND);
 // renderTemplate(tripEventList, createNewPoint(), 'beforeend');
-for (let i = 1; i < POINT_COUNT; i ++) {
-  render(tripListComponent.getElement(), new PointView(daySortPoints[i]).getElement(), RenderPosition.BEFOREEND);
+for (let i = 0; i < POINT_COUNT; i ++) {
+  renderPoint(tripListComponent.getElement(), daySortPoints[i]);
 }
