@@ -1,5 +1,18 @@
-import { getDateInFullFormat } from '../util.js';
+import { getDateInFullFormat, createElement } from '../util.js';
 import { TYPES, TOWNS } from '../const.js';
+
+const BLANK_POINT = {
+  type: TYPES[0],
+  town: '',
+  dateFrom: null,
+  dateTo: null,
+  price: null,
+  offers: [],
+  destination: {
+    description: '',
+    pictures: [],
+  },
+};
 
 const createPointEditTypeListTemplate = (currentType) => `<div class="event__type-list">
       <fieldset class="event__type-group">
@@ -49,19 +62,8 @@ ${pictures.length !== 0 ? `<div class="event__photos-container">
 </div>` : ''}
 </section>` : '';
 
-export const createPointEditTemplate = (point = {}) => {
-  const {
-    type = 'flight',
-    town = '',
-    dateFrom = null,
-    dateTo = null,
-    price = null,
-    offers = [],
-    destination = {
-      description: '',
-      pictures: [],
-    },
-  } = point;
+const createPointEditTemplate = (point) => {
+  const { type, town, dateFrom, dateTo, price, offers, destination } = point;
 
   const dateFromFormat = getDateInFullFormat(dateFrom);
   const dateToFormat = getDateInFullFormat(dateTo);
@@ -120,3 +122,26 @@ export const createPointEditTemplate = (point = {}) => {
     </form>
     </li>`;
 };
+
+export default class PointEdit {
+  constructor(point = BLANK_POINT) {
+    this._point = point;
+    this._element = null;
+  }
+
+  getTemplate() {
+    return createPointEditTemplate(this._point);
+  }
+
+  getElement() {
+    if (!this._element) {
+      this._element = createElement(this.getTemplate());
+    }
+
+    return this._element;
+  }
+
+  removeElement() {
+    this._element = null;
+  }
+}

@@ -1,4 +1,4 @@
-import { getDateInFormatMD, getDateInFormatYMD, getDateInFormatHM, calculateDateDifference } from '../util.js';
+import { getDateInFormatMD, getDateInFormatYMD, getDateInFormatHM, calculateDateDifference, createElement } from '../util.js';
 
 const createOfferPointTemplate = (offers) => offers.length !==0 ? `<ul class="event__selected-offers">
   ${offers.map(({title, price}) =>
@@ -9,7 +9,7 @@ const createOfferPointTemplate = (offers) => offers.length !==0 ? `<ul class="ev
     </li>`).join('')}
 </ul>` : '';
 
-export const createPointTemplate = (point) => {
+const createPointTemplate = (point) => {
   const {type, town, dateFrom, dateTo, price, isFavorite, offers} = point;
 
   const date = getDateInFormatMD(dateFrom);
@@ -54,3 +54,26 @@ export const createPointTemplate = (point) => {
     </div>
     </li>`;
 };
+
+export default class Point {
+  constructor(point) {
+    this._point = point;
+    this._element = null;
+  }
+
+  getTemplate() {
+    return createPointTemplate(this._point);
+  }
+
+  getElement() {
+    if (!this._element) {
+      this._element = createElement(this.getTemplate());
+    }
+
+    return this._element;
+  }
+
+  removeElement() {
+    this._element = null;
+  }
+}
