@@ -1,5 +1,5 @@
-import {FILTERS} from '../const.js';
-import { createElement } from '../util.js';
+import { FILTERS } from '../const.js';
+import Abstract from './abstract.js';
 
 const createFilterTemplate = () => `<form class="trip-filters" action="#" method="get">
   ${FILTERS.map((filter, index) => `<div class="trip-filters__filter">
@@ -10,24 +10,8 @@ const createFilterTemplate = () => `<form class="trip-filters" action="#" method
   <button class="visually-hidden" type="submit">Accept filter</button>
   </form>`;
 
-export default class Filter {
-  constructor() {
-    this._element = null;
-  }
-
+export default class Filter extends Abstract {
   getTemplate() {
     return createFilterTemplate();
-  }
-
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-
-    return this._element;
-  }
-
-  removeElement() {
-    this._element = null;
   }
 }

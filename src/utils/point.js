@@ -3,29 +3,6 @@ import dayjs from 'dayjs';
 const MINUTE_IN_HOUR = 60;
 const MINUTE_IN_DAY = 1440;
 
-export const RenderPosition = {
-  AFTERBEGIN: 'afterbegin',
-  BEFOREEND: 'beforeend',
-};
-
-export const render = (container, element, place) => {
-  switch (place) {
-    case RenderPosition.AFTERBEGIN:
-      container.prepend(element);
-      break;
-    case RenderPosition.BEFOREEND:
-      container.append(element);
-      break;
-  }
-};
-
-export const createElement = (template) => {
-  const newElement = document.createElement('div');
-  newElement.innerHTML = template;
-
-  return newElement.firstChild;
-};
-
 export const isDay1AfterDay2 = (day1, day2) => dayjs(day1).isAfter(day2) ? 1 : -1;
 
 export const isPointDateExpired = (date) => date === null ? false : dayjs(date).isBefore(dayjs(), 'D') && !dayjs(date).isSame(dayjs(), 'D');
@@ -62,5 +39,3 @@ export const calculateDateDifference = (dateTo, dateFrom) => {
   }
   return difference;
 };
-
-
