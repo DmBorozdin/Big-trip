@@ -1,4 +1,4 @@
-import { createElement } from '../util.js';
+import Abstract from './abstract.js';
 
 const createPriceTemplate = (points) => {
   const totalPrice = points.reduce((accumulator, point) => accumulator + point.price, 0);
@@ -8,25 +8,13 @@ const createPriceTemplate = (points) => {
 </p>`;
 };
 
-export default class Price {
+export default class Price extends Abstract {
   constructor(price) {
+    super();
     this._price = price;
-    this._element = null;
   }
 
   getTemplate() {
     return createPriceTemplate(this._price);
-  }
-
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-
-    return this._element;
-  }
-
-  removeElement() {
-    this._element = null;
   }
 }

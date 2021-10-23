@@ -1,4 +1,5 @@
-import { getDateInFormatMD, getDateInFormatYMD, getDateInFormatHM, calculateDateDifference, createElement } from '../util.js';
+import { getDateInFormatMD, getDateInFormatYMD, getDateInFormatHM, calculateDateDifference } from '../utils/point.js';
+import Abstract from './abstract.js';
 
 const createOfferPointTemplate = (offers) => offers.length !==0 ? `<ul class="event__selected-offers">
   ${offers.map(({title, price}) =>
@@ -55,25 +56,24 @@ const createPointTemplate = (point) => {
     </li>`;
 };
 
-export default class Point {
+export default class Point extends Abstract {
   constructor(point) {
+    super();
     this._point = point;
-    this._element = null;
+    this._rollupClickHandler = this._rollupClickHandler.bind(this);
   }
 
   getTemplate() {
     return createPointTemplate(this._point);
   }
 
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-
-    return this._element;
+  _rollupClickHandler(evt) {
+    evt.preventDefault();
+    this._callback.rollupClick();
   }
 
-  removeElement() {
-    this._element = null;
+  setRollupClickHandler(callback) {
+    this._callback.rollupClick = callback;
+    this.getElement().querySelector('.event__rollup-btn').addEventListener('click', this._rollupClickHandler);
   }
 }

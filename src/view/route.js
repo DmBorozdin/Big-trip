@@ -1,5 +1,5 @@
-import { getDateInFormatDM } from '../util.js';
-import { createElement } from '../util.js';
+import { getDateInFormatDM } from '../utils/point.js';
+import Abstract from './abstract.js';
 
 const TOWNS_COUNT = 3;
 
@@ -15,25 +15,13 @@ const createRouteTemplate = (points) => {
   </div>`;
 };
 
-export default class Route {
+export default class Route extends Abstract {
   constructor(points) {
+    super();
     this._points = points;
-    this._element = null;
   }
 
   getTemplate() {
     return createRouteTemplate(this._points);
-  }
-
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-
-    return this._element;
-  }
-
-  removeElement() {
-    this._element = null;
   }
 }

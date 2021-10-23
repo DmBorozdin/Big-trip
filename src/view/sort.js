@@ -1,5 +1,5 @@
-import {SORTS} from '../const.js';
-import { createElement } from '../util.js';
+import { SORTS } from '../const.js';
+import Abstract from './abstract.js';
 
 const createSortTemplate = () => `<form class="trip-events__trip-sort  trip-sort" action="#" method="get">
   ${SORTS.map((sort, index) => `<div class="trip-sort__item  trip-sort__item--${sort}">
@@ -8,24 +8,8 @@ const createSortTemplate = () => `<form class="trip-events__trip-sort  trip-sort
 </div>`).join('')}
 </form>`;
 
-export default class Sort {
-  constructor() {
-    this._element = null;
-  }
-
+export default class Sort extends Abstract {
   getTemplate() {
     return createSortTemplate();
-  }
-
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-
-    return this._element;
-  }
-
-  removeElement() {
-    this._element = null;
   }
 }

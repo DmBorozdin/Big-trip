@@ -1,4 +1,4 @@
-import { isDay1AfterDay2 } from './util.js';
+import { isDay1AfterDay2 } from './utils/point.js';
 
 import MenuView from './view/menu.js';
 import TripInfoView from './view/trip-info.js';
@@ -13,7 +13,7 @@ import PointEditView from './view/point-edit.js';
 import { generatePoint } from './mock/point.js';
 import EmptyListView from './view/list-empty.js';
 // import { generateFilter } from './mock/filter.js';
-import { render, RenderPosition } from './util.js';
+import { render, RenderPosition, replace } from './utils/render.js';
 
 const POINT_COUNT = 10;
 
@@ -31,11 +31,11 @@ const renderPoint = (tripListElement, point) => {
   const pointEditComponent = new PointEditView(point);
 
   const replacePointToForm = () => {
-    tripListElement.replaceChild(pointEditComponent.getElement(), pointComponent.getElement());
+    replace(pointEditComponent, pointComponent);
   };
 
   const replaceFormToPoint = () => {
-    tripListElement.replaceChild(pointComponent.getElement(), pointEditComponent.getElement());
+    replace(pointComponent, pointEditComponent);
   };
 
   const onEscKeyDown = (evt) => {
@@ -46,50 +46,49 @@ const renderPoint = (tripListElement, point) => {
     }
   };
 
-  pointComponent.getElement().querySelector('.event__rollup-btn').addEventListener('click', () => {
+  pointComponent.setRollupClickHandler(() => {
     replacePointToForm();
     document.addEventListener('keydown', onEscKeyDown);
   });
 
-  pointEditComponent.getElement().querySelector('form').addEventListener('submit', (evt) => {
-    evt.preventDefault();
+  pointEditComponent.setFormSubmitHandler(() => {
     replaceFormToPoint();
     document.removeEventListener('keydown', onEscKeyDown);
   });
 
-  pointEditComponent.getElement().querySelector('.event__rollup-btn').addEventListener('click', () => {
+  pointEditComponent.setRollupClickHandler(() => {
     replaceFormToPoint();
     document.removeEventListener('keydown', onEscKeyDown);
   });
 
-  render(tripListElement, pointComponent.getElement(), RenderPosition.BEFOREEND);
+  render(tripListElement, pointComponent, RenderPosition.BEFOREEND);
 };
 
 const renderTripInfo = (tripInfoContainer, tripInfoPoints) => {
   if (tripInfoPoints.length !== 0) {
     const tripInfoComponent = new TripInfoView();
-    render(tripInfoContainer, tripInfoComponent.getElement(), RenderPosition.AFTERBEGIN);
-    render(tripInfoComponent.getElement(), new RouteView(daySortPoints).getElement(), RenderPosition.AFTERBEGIN);
-    render(tripInfoComponent.getElement(), new PriceView(points).getElement(), RenderPosition.BEFOREEND);
+    render(tripInfoContainer, tripInfoComponent, RenderPosition.AFTERBEGIN);
+    render(tripInfoComponent, new RouteView(daySortPoints), RenderPosition.AFTERBEGIN);
+    render(tripInfoComponent, new PriceView(points), RenderPosition.BEFOREEND);
   }
 };
 
 const renderList = (tripListContainer, listPoints) => {
   if (listPoints.length === 0) {
-    render(tripListContainer, new EmptyListView().getElement(), RenderPosition.BEFOREEND);
+    render(tripListContainer, new EmptyListView(), RenderPosition.BEFOREEND);
   } else {
-    render(tripListContainer, new SortView().getElement(), RenderPosition.BEFOREEND);
+    render(tripListContainer, new SortView(), RenderPosition.BEFOREEND);
     const tripListComponent = new TripListView();
-    render(tripListContainer, tripListComponent.getElement(), RenderPosition.BEFOREEND);
+    render(tripListContainer, tripListComponent, RenderPosition.BEFOREEND);
 
     // renderTemplate(tripEventList, createNewPoint(), 'beforeend');
     for (let i = 0; i < POINT_COUNT; i ++) {
-      renderPoint(tripListComponent.getElement(), listPoints[i]);
+      renderPoint(tripListComponent, listPoints[i]);
     }
   }
 };
 
-render(tripNavigation, new MenuView().getElement(), RenderPosition.BEFOREEND);
-render(tripFilter, new FilterView().getElement(), RenderPosition.BEFOREEND);
+render(tripNavigation, new MenuView(), RenderPosition.BEFOREEND);
+render(tripFilter, new FilterView(), RenderPosition.BEFOREEND);
 renderTripInfo(tripMain, points);
 renderList(tripEvent, daySortPoints);
