@@ -23,9 +23,9 @@ export default class Trip {
     this._renderTrip();
   }
 
-  _handlePointChange(updatePoint) {
-    this._tripPoints = updateItem(this._tripPoints, updatePoint);
-    this._tripPresenter[updatePoint.id] = this.init(updatePoint);
+  _handlePointChange(updatedPoint) {
+    this._tripPoints = updateItem(this._tripPoints, updatedPoint);
+    this._tripPresenter[updatedPoint.id].init(updatedPoint);
   }
 
   _renderSort() {
