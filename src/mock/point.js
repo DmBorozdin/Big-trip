@@ -1,5 +1,5 @@
 import dayjs from 'dayjs';
-
+import { nanoid } from 'nanoid';
 import {TOWNS, TYPES, OFFERS} from '../const.js';
 
 const MAX_PRICE = 1500;
@@ -65,6 +65,7 @@ export const generatePoint = () => {
   const type = getRandomArrayElement(TYPES);
 
   return {
+    id: nanoid(),
     type,
     town: getRandomArrayElement(TOWNS),
     offers: getOffer(type),

@@ -10,7 +10,6 @@ import TripPresenter from './presenter/trip.js';
 import { render, RenderPosition } from './utils/render.js';
 
 const POINT_COUNT = 10;
-
 const points = new Array(POINT_COUNT).fill(null).map(generatePoint);
 const daySortPoints = points.slice().sort((point1, point2) =>  isDay1AfterDay2(point1.dateFrom, point2.dateFrom));
 
