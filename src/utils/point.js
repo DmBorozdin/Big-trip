@@ -39,3 +39,51 @@ export const calculateDateDifference = (dateTo, dateFrom) => {
   }
   return difference;
 };
+
+const getWeightForNullValue = (valueA, valueB) => {
+  if (valueA === null && valueB === null) {
+    return 0;
+  }
+
+  if (valueA === null) {
+    return 1;
+  }
+
+  if (valueB === null) {
+    return -1;
+  }
+
+  return null;
+};
+
+export const sortPointByDay = (pointA, pointB) => {
+  const weight = getWeightForNullValue(pointA.dateFrom, pointB.dateFrom);
+
+  if (weight !== null) {
+    return weight;
+  }
+
+  return dayjs(pointA.dateFrom).diff(dayjs(pointB.dateFrom));
+};
+
+export const sortPointByPrice = (pointA, pointB) => {
+  const weight = getWeightForNullValue(pointA.price, pointB.price);
+
+  if (weight !== null) {
+    return weight;
+  }
+
+  return pointB.price - pointA.price;
+};
+
+export const sortPointByDuration = (pointA, pointB) => {
+  const pointADuration = dayjs(pointA.dateTo).diff(dayjs(pointA.dateFrom));
+  const pointBDuration = dayjs(pointB.dateTo).diff(dayjs(pointB.dateFrom));
+  const weight = getWeightForNullValue(pointADuration, pointBDuration);
+
+  if (weight !== null) {
+    return weight;
+  }
+
+  return pointBDuration - pointADuration;
+};

@@ -33,4 +33,4 @@ const tripPresenter = new TripPresenter(tripEvent);
 render(tripNavigation, new MenuView(), RenderPosition.BEFOREEND);
 render(tripFilter, new FilterView(), RenderPosition.BEFOREEND);
 renderTripInfo(tripMain, points);
-tripPresenter.init(daySortPoints);
+tripPresenter.init(points);

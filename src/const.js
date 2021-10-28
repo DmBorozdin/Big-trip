@@ -6,6 +6,12 @@ export const FILTERS = ['everything', 'future', 'past'];
 
 export const SORTS = ['day', 'event', 'time', 'price', 'offer'];
 
+export const AvailableSortType = {
+  DAY: 'day',
+  TIME: 'time',
+  PRICE: 'price',
+};
+
 export const OFFERS = [
   {
     type: 'taxi',
