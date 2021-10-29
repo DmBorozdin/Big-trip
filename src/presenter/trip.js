@@ -4,7 +4,7 @@ import TripListView from '../view/trip-list.js';
 import EmptyListView from '../view/list-empty.js';
 import PointPresenter from './point.js';
 import { updateItem } from '../utils/common.js';
-import { render, RenderPosition} from '../utils/render.js';
+import { render, RenderPosition, remove} from '../utils/render.js';
 import { sortPointByDay, sortPointByPrice, sortPointByDuration } from '../utils/point.js';
 import { AvailableSortType } from '../const.js';
 
@@ -14,7 +14,7 @@ export default class Trip {
     this._tripPresenter = {};
     this._currentSortType = AvailableSortType.DAY;
 
-    this._sortComponent = new SortView();
+    this._sortComponent = null;
     this._tripListComponent = new TripListView();
     this._emptyListView = new EmptyListView();
 
@@ -64,9 +64,12 @@ export default class Trip {
     this._sortPoints(sortType);
     this._clearTripList();
     this._renderTripList();
+    this._clearSortForm();
+    this._renderSort();
   }
 
   _renderSort() {
+    this._sortComponent = new SortView(this._currentSortType);
     render(this._tripContainer, this._sortComponent, RenderPosition.AFTERBEGIN);
     this._sortComponent.setSortTypeChangeHandler(this._handleSortTypeChange);
   }
@@ -93,6 +96,10 @@ export default class Trip {
   _clearTripList() {
     Object.values(this._tripPresenter).forEach((presenter) => presenter.destroy());
     this._tripPresenter = {};
+  }
+
+  _clearSortForm() {
+    remove(this._sortComponent);
   }
 
   _renderTrip() {
