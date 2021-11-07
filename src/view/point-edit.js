@@ -37,12 +37,18 @@ const createPointEditDestinationListTemplate = () =>  `<datalist id="destination
       ${TOWNS.map((town) => `<option value="${town}"></option>`).join('')}
     </datalist>`;
 
-const createPointEditOfferTemplate = (offers) => offers.length !==0 ? `<section class="event__section  event__section--offers">
+const createPointEditOfferTemplate = (allOffers, offers) => allOffers.length !==0 ? `<section class="event__section  event__section--offers">
   <h3 class="event__section-title  event__section-title--offers">Offers</h3>
   <div class="event__available-offers">
-    ${offers.map(({title, price}, index) =>
+    ${allOffers.map(({title, price}, index) =>
     `<div class="event__offer-selector">
-      <input class="event__offer-checkbox  visually-hidden" id="event-offer-${title}-${index}" type="checkbox" name="event-offer-${title}">
+      <input class="event__offer-checkbox
+        visually-hidden"
+        id="event-offer-${title}-${index}"
+        type="checkbox"
+        name="event-offer-${title}"
+        ${offers.some((offer) => offer.title === title) ? 'checked' : ''}
+      >
       <label class="event__offer-label" for="event-offer-${title}-${index}">
         <span class="event__offer-title">${title}</span>
         &plus;&euro;&nbsp;
@@ -63,15 +69,15 @@ ${pictures.length !== 0 ? `<div class="event__photos-container">
 </div>` : ''}
 </section>` : '';
 
-const createPointEditTemplate = (point) => {
-  const { type, town, dateFrom, dateTo, price, offers, destination } = point;
+const createPointEditTemplate = (data) => {
+  const { type, dateFrom, dateTo, price, offers, destination, allOffers } = data;
 
   const dateFromFormat = getDateInFullFormat(dateFrom);
   const dateToFormat = getDateInFullFormat(dateTo);
 
   const typeListTemplate = createPointEditTypeListTemplate(type);
   const destinationListTemplate = createPointEditDestinationListTemplate();
-  const offerTemplate = createPointEditOfferTemplate(offers);
+  const offerTemplate = createPointEditOfferTemplate(allOffers, offers);
   const destinationTemplate = createPointEditDestinationTemplate(destination);
 
   return `<li class="trip-events__item">
@@ -90,7 +96,7 @@ const createPointEditTemplate = (point) => {
           <label class="event__label  event__type-output" for="event-destination-1">
           ${type}
           </label>
-          <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${town}" list="destination-list-1">
+          <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${destination.name}" list="destination-list-1">
           ${destinationListTemplate}
         </div>
 
@@ -125,20 +131,83 @@ const createPointEditTemplate = (point) => {
 };
 
 export default class PointEdit extends Abstract {
-  constructor(point = BLANK_POINT) {
+  constructor(point = BLANK_POINT, offers, allDestinations) {
     super();
-    this._point = point;
+    this._data = PointEdit.parsePointToData(point, offers, allDestinations);
     this._formSubmitHandler = this._formSubmitHandler.bind(this);
     this._rollupClickHandler = this._rollupClickHandler.bind(this);
+    this._typeChangeHandler = this._typeChangeHandler.bind(this);
+    this._destinationInputHandler = this._destinationInputHandler.bind(this);
+
+    this._setInnerHandlers();
   }
 
   getTemplate() {
-    return createPointEditTemplate(this._point);
+    return createPointEditTemplate(this._data);
+  }
+
+  updateData(update) {
+    if (!update) {
+      return;
+    }
+
+    this._data = Object.assign(
+      {},
+      this._data,
+      update,
+    );
+
+    this.updateElement();
+  }
+
+  updateElement() {
+    const prevElement = this.getElement();
+    const parent = prevElement.parentElement;
+    this.removeElement();
+
+    const newElement = this.getElement();
+    parent.replaceChild(newElement, prevElement);
+
+    this.restoreHandlers();
+  }
+
+  restoreHandlers() {
+    this._setInnerHandlers();
+    this._destinationInputHandler();
+    this.setFormSubmitHandler(this._callback.formSubmit);
+    this.setRollupClickHandler(this._callback.rollupClick);
+  }
+
+  _setInnerHandlers() {
+    this.getElement().querySelector('.event__type-group').addEventListener('change', this._typeChangeHandler);
+    this.getElement().querySelector('.event__input--destination').addEventListener('change', this._destinationInputHandler);
+  }
+
+  _destinationInputHandler(evt) {
+    evt.preventDefault();
+    let newDestination = this._data.allDestinations.find((destination) => destination.name === evt.target.value);
+    if (newDestination === undefined) {
+      newDestination = {
+        description: '',
+        name: '',
+        pictures: [],
+      };
+    }
+    this.updateData({
+      destination: newDestination,
+    });
+  }
+
+  _typeChangeHandler(evt) {
+    evt.preventDefault();
+    this.updateData({
+      type: evt.target.value,
+    });
   }
 
   _formSubmitHandler(evt) {
     evt.preventDefault();
-    this._callback.formSubmit(this._point);
+    this._callback.formSubmit(PointEdit.parseDataToPoint(this._data));
   }
 
   setFormSubmitHandler(callback) {
@@ -154,5 +223,22 @@ export default class PointEdit extends Abstract {
   setRollupClickHandler(callback) {
     this._callback.rollupClick = callback;
     this.getElement().querySelector('.event__rollup-btn').addEventListener('click', this._rollupClickHandler);
+  }
+
+  static parsePointToData(point, offers, allDestinations) {
+    return Object.assign(
+      {},
+      point,
+      {
+        allOffers: offers,
+        allDestinations,
+      });
+  }
+
+  static parseDataToPoint(data) {
+    data = Object.assign({}, data);
+    delete data.allOffers;
+    delete data.allDestinations;
+    return data;
   }
 }

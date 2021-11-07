@@ -24,14 +24,16 @@ export default class Point {
     this._escKeyDownHandler = this._escKeyDownHandler.bind(this);
   }
 
-  init(point) {
+  init(point, offers, allDestinations) {
     this._point = point;
+    this._currentPointType = this._point.type;
+    this._allOffersForCurrentPointType = offers.find((offer) => offer.type === this._currentPointType).offers;
 
     const prevPointComponent = this._pointComponent;
     const prevPointEditComponent = this._pointEditComponent;
 
     this._pointComponent = new PointView(point);
-    this._pointEditComponent = new PointEditView(point);
+    this._pointEditComponent = new PointEditView(point, this._allOffersForCurrentPointType, allDestinations);
 
     this._pointComponent.setRollupClickHandler(this._handleExpandClick);
     this._pointComponent.setFavoriteClickHandler(this._handleFavoriteClick);
