@@ -24,6 +24,10 @@ export const OFFERS = [
         title: 'Choose the radio station',
         price: 5,
       },
+      {
+        title: 'Order Uber',
+        price: 20,
+      },
     ],
   },
   {

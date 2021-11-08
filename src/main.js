@@ -4,9 +4,10 @@ import TripInfoView from './view/trip-info.js';
 import RouteView from './view/route.js';
 import PriceView from './view/price.js';
 import FilterView from './view/filter.js';
-import { generatePoint } from './mock/point.js';
+import { generatePoint, Destinations } from './mock/point.js';
 // import { generateFilter } from './mock/filter.js';
 import TripPresenter from './presenter/trip.js';
+import { OFFERS } from './const.js';
 import { render, RenderPosition } from './utils/render.js';
 
 const POINT_COUNT = 10;
@@ -33,4 +34,4 @@ const tripPresenter = new TripPresenter(tripEvent);
 render(tripNavigation, new MenuView(), RenderPosition.BEFOREEND);
 render(tripFilter, new FilterView(), RenderPosition.BEFOREEND);
 renderTripInfo(tripMain, points);
-tripPresenter.init(points);
+tripPresenter.init(points, OFFERS, Destinations);

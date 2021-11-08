@@ -6,7 +6,7 @@ import PointPresenter from './point.js';
 import { updateItem } from '../utils/common.js';
 import { render, RenderPosition, remove} from '../utils/render.js';
 import { sortPointByDay, sortPointByPrice, sortPointByDuration } from '../utils/point.js';
-import { AvailableSortType } from '../const.js';
+import { AvailableSortType} from '../const.js';
 
 export default class Trip {
   constructor(tripContainer) {
@@ -23,8 +23,10 @@ export default class Trip {
     this._handleSortTypeChange = this._handleSortTypeChange.bind(this);
   }
 
-  init(tripPoints) {
+  init(tripPoints, OFFERS, destinations) {
     this._tripPoints = tripPoints.slice();
+    this._offers = OFFERS.slice();
+    this._destinations = destinations.slice();
     this._sourcedTripPoints = tripPoints.slice();
     this._sortPoints(this._currentSortType);
     this._renderTrip();
@@ -37,7 +39,7 @@ export default class Trip {
   _handlePointChange(updatedPoint) {
     this._tripPoints = updateItem(this._tripPoints, updatedPoint);
     this._sourcedTripPoints = updateItem(this._sourcedTripPoints, updatedPoint);
-    this._tripPresenter[updatedPoint.id].init(updatedPoint);
+    this._tripPresenter[updatedPoint.id].init(updatedPoint, this._offers, this._destinations);
   }
 
   _sortPoints(sortType) {
@@ -76,7 +78,7 @@ export default class Trip {
 
   _renderPoint(point) {
     const pointPresenter = new PointPresenter(this._tripListComponent, this._handlePointChange, this._handleModeChange);
-    pointPresenter.init(point);
+    pointPresenter.init(point, this._offers, this._destinations);
     this._tripPresenter[point.id] = pointPresenter;
   }
 

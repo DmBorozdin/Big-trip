@@ -57,8 +57,17 @@ const generateDescription = () => {
 
 const getOffer = (type) => {
   const typeOffer = OFFERS.find((offer) => offer.type === type);
-  return typeOffer.offers;
+  const offerCount = getRandomInteger(0, typeOffer.offers.length - 1);
+  return getNewRandomArray(typeOffer.offers, offerCount);
 };
+
+const generateDestination = () => TOWNS.map((town) => ({
+  description: generateDescription(),
+  name: town,
+  pictures: generatePicture(),
+}));
+
+export const Destinations = generateDestination();
 
 export const generatePoint = () => {
   const [dateFrom, dateTo] = generateDate();
@@ -67,12 +76,8 @@ export const generatePoint = () => {
   return {
     id: nanoid(),
     type,
-    town: getRandomArrayElement(TOWNS),
     offers: getOffer(type),
-    destination: {
-      description: generateDescription(),
-      pictures: generatePicture(),
-    },
+    destination: getRandomArrayElement(Destinations),
     dateFrom,
     dateTo,
     price: getRandomInteger(0, MAX_PRICE),
