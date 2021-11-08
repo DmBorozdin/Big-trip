@@ -144,6 +144,12 @@ export default class PointEdit extends Smart {
     this._setInnerHandlers();
   }
 
+  reset(point, allOffers, allDestinations) {
+    this.updateData(
+      PointEdit.parsePointToData(point, allOffers, allDestinations),
+    );
+  }
+
   getTemplate() {
     return createPointEditTemplate(this._data);
   }
