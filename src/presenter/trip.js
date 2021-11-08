@@ -6,14 +6,13 @@ import PointPresenter from './point.js';
 import { updateItem } from '../utils/common.js';
 import { render, RenderPosition, remove} from '../utils/render.js';
 import { sortPointByDay, sortPointByPrice, sortPointByDuration } from '../utils/point.js';
-import { AvailableSortType, OFFERS } from '../const.js';
+import { AvailableSortType} from '../const.js';
 
 export default class Trip {
   constructor(tripContainer) {
     this._tripContainer = tripContainer;
     this._tripPresenter = {};
     this._currentSortType = AvailableSortType.DAY;
-    this._offers = OFFERS;
 
     this._sortComponent = null;
     this._tripListComponent = new TripListView();
@@ -24,8 +23,9 @@ export default class Trip {
     this._handleSortTypeChange = this._handleSortTypeChange.bind(this);
   }
 
-  init(tripPoints, destinations) {
+  init(tripPoints, OFFERS, destinations) {
     this._tripPoints = tripPoints.slice();
+    this._offers = OFFERS.slice();
     this._destinations = destinations.slice();
     this._sourcedTripPoints = tripPoints.slice();
     this._sortPoints(this._currentSortType);
@@ -39,7 +39,7 @@ export default class Trip {
   _handlePointChange(updatedPoint) {
     this._tripPoints = updateItem(this._tripPoints, updatedPoint);
     this._sourcedTripPoints = updateItem(this._sourcedTripPoints, updatedPoint);
-    this._tripPresenter[updatedPoint.id].init(updatedPoint);
+    this._tripPresenter[updatedPoint.id].init(updatedPoint, this._offers, this._destinations);
   }
 
   _sortPoints(sortType) {

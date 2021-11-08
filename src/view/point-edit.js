@@ -1,5 +1,5 @@
 import { getDateInFullFormat } from '../utils/point.js';
-import Abstract from './abstract.js';
+import Smart from './smart.js';
 import { TYPES, TOWNS } from '../const.js';
 
 const BLANK_POINT = {
@@ -74,10 +74,11 @@ const createPointEditTemplate = (data) => {
 
   const dateFromFormat = getDateInFullFormat(dateFrom);
   const dateToFormat = getDateInFullFormat(dateTo);
+  const allOffersForCurrentPointType = allOffers.find((offer) => offer.type === type).offers;
 
   const typeListTemplate = createPointEditTypeListTemplate(type);
   const destinationListTemplate = createPointEditDestinationListTemplate();
-  const offerTemplate = createPointEditOfferTemplate(allOffers, offers);
+  const offerTemplate = createPointEditOfferTemplate(allOffersForCurrentPointType, offers);
   const destinationTemplate = createPointEditDestinationTemplate(destination);
 
   return `<li class="trip-events__item">
@@ -130,14 +131,15 @@ const createPointEditTemplate = (data) => {
     </li>`;
 };
 
-export default class PointEdit extends Abstract {
-  constructor(point = BLANK_POINT, offers, allDestinations) {
+export default class PointEdit extends Smart {
+  constructor(point = BLANK_POINT, allOffers, allDestinations) {
     super();
-    this._data = PointEdit.parsePointToData(point, offers, allDestinations);
+    this._data = PointEdit.parsePointToData(point, allOffers, allDestinations);
     this._formSubmitHandler = this._formSubmitHandler.bind(this);
     this._rollupClickHandler = this._rollupClickHandler.bind(this);
     this._typeChangeHandler = this._typeChangeHandler.bind(this);
     this._destinationInputHandler = this._destinationInputHandler.bind(this);
+    this._offerChangeHandler = this._offerChangeHandler.bind(this);
 
     this._setInnerHandlers();
   }
@@ -146,34 +148,8 @@ export default class PointEdit extends Abstract {
     return createPointEditTemplate(this._data);
   }
 
-  updateData(update) {
-    if (!update) {
-      return;
-    }
-
-    this._data = Object.assign(
-      {},
-      this._data,
-      update,
-    );
-
-    this.updateElement();
-  }
-
-  updateElement() {
-    const prevElement = this.getElement();
-    const parent = prevElement.parentElement;
-    this.removeElement();
-
-    const newElement = this.getElement();
-    parent.replaceChild(newElement, prevElement);
-
-    this.restoreHandlers();
-  }
-
   restoreHandlers() {
     this._setInnerHandlers();
-    this._destinationInputHandler();
     this.setFormSubmitHandler(this._callback.formSubmit);
     this.setRollupClickHandler(this._callback.rollupClick);
   }
@@ -181,6 +157,10 @@ export default class PointEdit extends Abstract {
   _setInnerHandlers() {
     this.getElement().querySelector('.event__type-group').addEventListener('change', this._typeChangeHandler);
     this.getElement().querySelector('.event__input--destination').addEventListener('change', this._destinationInputHandler);
+    const offersCollection = this.getElement().querySelectorAll('.event__offer-selector');
+    for (const offer of offersCollection) {
+      offer.addEventListener('change', this._offerChangeHandler);
+    }
   }
 
   _destinationInputHandler(evt) {
@@ -202,7 +182,23 @@ export default class PointEdit extends Abstract {
     evt.preventDefault();
     this.updateData({
       type: evt.target.value,
+      offers: [],
     });
+  }
+
+  _offerChangeHandler(evt) {
+    evt.preventDefault();
+    const allOffersForCurrentPointType = this._data.allOffers.find((offer) => offer.type === this._data.type).offers;
+    const targetOffer = allOffersForCurrentPointType.find((offer) => offer.title === evt.target.name.slice(12));
+    if (evt.target.checked) {
+      this.updateData({
+        offers: this._data.offers.concat(targetOffer),
+      });
+    } else {
+      this.updateData({
+        offers: this._data.offers.filter((offer) => offer.title !== targetOffer.title),
+      });
+    }
   }
 
   _formSubmitHandler(evt) {
@@ -225,12 +221,12 @@ export default class PointEdit extends Abstract {
     this.getElement().querySelector('.event__rollup-btn').addEventListener('click', this._rollupClickHandler);
   }
 
-  static parsePointToData(point, offers, allDestinations) {
+  static parsePointToData(point, allOffers, allDestinations) {
     return Object.assign(
       {},
       point,
       {
-        allOffers: offers,
+        allOffers,
         allDestinations,
       });
   }
