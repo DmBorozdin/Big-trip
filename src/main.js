@@ -9,10 +9,14 @@ import { generatePoint, Destinations } from './mock/point.js';
 import TripPresenter from './presenter/trip.js';
 import { OFFERS } from './const.js';
 import { render, RenderPosition } from './utils/render.js';
+import PointsModel from './model/points.js';
 
 const POINT_COUNT = 10;
 const points = new Array(POINT_COUNT).fill(null).map(generatePoint);
 const daySortPoints = points.slice().sort((point1, point2) =>  isDay1AfterDay2(point1.dateFrom, point2.dateFrom));
+
+const pointsModel = new PointsModel();
+pointsModel.setPoints(points);
 
 const pageHeader = document.querySelector('.page-header');
 const tripMain = pageHeader.querySelector('.trip-main');
@@ -29,9 +33,9 @@ const renderTripInfo = (tripInfoContainer, tripInfoPoints) => {
   }
 };
 
-const tripPresenter = new TripPresenter(tripEvent);
+const tripPresenter = new TripPresenter(tripEvent, pointsModel);
 
 render(tripNavigation, new MenuView(), RenderPosition.BEFOREEND);
 render(tripFilter, new FilterView(), RenderPosition.BEFOREEND);
 renderTripInfo(tripMain, points);
-tripPresenter.init(points, OFFERS, Destinations);
+tripPresenter.init(OFFERS, Destinations);
