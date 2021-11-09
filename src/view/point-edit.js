@@ -1,4 +1,4 @@
-import { getDateInFullFormat } from '../utils/point.js';
+import { getDateInFullFormat, isDay1AfterDay2 } from '../utils/point.js';
 import Smart from './smart.js';
 import { TYPES, TOWNS } from '../const.js';
 import flatpickr from 'flatpickr';
@@ -138,13 +138,19 @@ export default class PointEdit extends Smart {
   constructor(point = BLANK_POINT, allOffers, allDestinations) {
     super();
     this._data = PointEdit.parsePointToData(point, allOffers, allDestinations);
+    this._datepickerFrom = null;
+    this._datepickerTo = null;
+
     this._formSubmitHandler = this._formSubmitHandler.bind(this);
     this._rollupClickHandler = this._rollupClickHandler.bind(this);
     this._typeChangeHandler = this._typeChangeHandler.bind(this);
     this._destinationInputHandler = this._destinationInputHandler.bind(this);
     this._offerChangeHandler = this._offerChangeHandler.bind(this);
+    this._dateFromChangeHandler = this._dateFromChangeHandler.bind(this);
+    this._dateToChangeHandler = this._dateToChangeHandler.bind(this);
 
     this._setInnerHandlers();
+    this._setDatepicker();
   }
 
   reset(point, allOffers, allDestinations) {
@@ -159,8 +165,41 @@ export default class PointEdit extends Smart {
 
   restoreHandlers() {
     this._setInnerHandlers();
+    this._setDatepicker();
     this.setFormSubmitHandler(this._callback.formSubmit);
     this.setRollupClickHandler(this._callback.rollupClick);
+  }
+
+  _setDatepicker() {
+    if (this._datepickerFrom) {
+      this._datepickerFrom.destroy();
+      this._datepickerFrom = null;
+    }
+    if (this._datepickerTo) {
+      this._datepickerTo.destroy();
+      this._datepickerTo = null;
+    }
+
+    this._datepickerFrom = flatpickr(
+      this.getElement().querySelector('#event-start-time-1'),
+      {
+        enableTime: true,
+        dateFormat: 'd/m/Y H:i',
+        defaultDate: this._data.dateFrom,
+        onChange: this._dateFromChangeHandler,
+      },
+    );
+
+    this._datepickerTo = flatpickr(
+      this.getElement().querySelector('#event-end-time-1'),
+      {
+        enableTime: true,
+        dateFormat: 'd/m/Y H:i',
+        defaultDate: this._data.dateTo,
+        minDate: this._data.dateFrom,
+        onChange: this._dateToChangeHandler,
+      },
+    );
   }
 
   _setInnerHandlers() {
@@ -210,8 +249,25 @@ export default class PointEdit extends Smart {
     }
   }
 
+  _dateFromChangeHandler([userDate]) {
+    this.updateData({
+      dateFrom: userDate,
+    });
+  }
+
+  _dateToChangeHandler([userDate]) {
+    this.updateData({
+      dateTo: userDate,
+    });
+  }
+
   _formSubmitHandler(evt) {
     evt.preventDefault();
+    if (isDay1AfterDay2(this._data.dateFrom, this._data.dateTo) > 0 ) {
+      this.updateData({
+        dateTo: this._data.dateFrom,
+      });
+    }
     this._callback.formSubmit(PointEdit.parseDataToPoint(this._data));
   }
 
