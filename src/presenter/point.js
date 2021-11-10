@@ -2,6 +2,7 @@ import PointView from '../view/point.js';
 import PointEditView from '../view/point-edit.js';
 import { render, RenderPosition, replace, remove} from '../utils/render.js';
 import { UserAction, UpdateType } from '../const.js';
+import { isDatesEqual } from '../utils/point.js';
 
 const Mode = {
   DEFAULT: 'DEFAULT',
@@ -97,14 +98,19 @@ export default class Point {
 
   _handleFavoriteClick() {
     this._changeData(
-      UserAction.UPDATE_TASK,
-      UpdateType.MINOR,
+      UserAction.UPDATE_POINT,
+      UpdateType.PATCH,
       Object.assign({}, this._point, {isFavorite: !this._point.isFavorite}),
     );
   }
 
-  _handleFormSubmit(point) {
-    this._changeData(UserAction.UPDATE_TASK, UpdateType.MINOR,point);
+  _handleFormSubmit(update) {
+    const isMinorUpdate = !isDatesEqual(this._point.dateFrom, update.dateFrom) || !isDatesEqual(this._point.dateTo, update.dateTo);
+    this._changeData(
+      UserAction.UPDATE_POINT,
+      isMinorUpdate ? UpdateType.MINOR : UpdateType.PATCH,
+      update,
+    );
     this._replaceFormToPoint();
   }
 

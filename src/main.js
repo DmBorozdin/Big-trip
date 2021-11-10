@@ -33,9 +33,9 @@ const renderTripInfo = (tripInfoContainer, tripInfoPoints) => {
   }
 };
 
-const tripPresenter = new TripPresenter(tripEvent, pointsModel);
+const tripPresenter = new TripPresenter(tripEvent, pointsModel, OFFERS, Destinations);
 
 render(tripNavigation, new MenuView(), RenderPosition.BEFOREEND);
 render(tripFilter, new FilterView(), RenderPosition.BEFOREEND);
 renderTripInfo(tripMain, points);
-tripPresenter.init(OFFERS, Destinations);
+tripPresenter.init();
