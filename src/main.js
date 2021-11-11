@@ -3,13 +3,14 @@ import MenuView from './view/menu.js';
 import TripInfoView from './view/trip-info.js';
 import RouteView from './view/route.js';
 import PriceView from './view/price.js';
-import FilterView from './view/filter.js';
 import { generatePoint, Destinations } from './mock/point.js';
-// import { generateFilter } from './mock/filter.js';
 import TripPresenter from './presenter/trip.js';
+import FilterPresenter from './presenter/filter.js';
 import { OFFERS } from './const.js';
-import { render, RenderPosition } from './utils/render.js';
 import PointsModel from './model/points.js';
+import FilterModel from './model/filter.js';
+import { render, RenderPosition } from './utils/render.js';
+
 
 const POINT_COUNT = 10;
 const points = new Array(POINT_COUNT).fill(null).map(generatePoint);
@@ -17,6 +18,7 @@ const daySortPoints = points.slice().sort((point1, point2) =>  isDay1AfterDay2(p
 
 const pointsModel = new PointsModel();
 pointsModel.setPoints(points);
+const filterModel = new FilterModel();
 
 const pageHeader = document.querySelector('.page-header');
 const tripMain = pageHeader.querySelector('.trip-main');
@@ -33,9 +35,11 @@ const renderTripInfo = (tripInfoContainer, tripInfoPoints) => {
   }
 };
 
-const tripPresenter = new TripPresenter(tripEvent, pointsModel, OFFERS, Destinations);
-
 render(tripNavigation, new MenuView(), RenderPosition.BEFOREEND);
-render(tripFilter, new FilterView(), RenderPosition.BEFOREEND);
 renderTripInfo(tripMain, points);
+
+const tripPresenter = new TripPresenter(tripEvent, pointsModel, filterModel, OFFERS, Destinations);
+const filterPresenter = new FilterPresenter(tripFilter, filterModel);
+
+filterPresenter.init();
 tripPresenter.init();
