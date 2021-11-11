@@ -7,13 +7,13 @@ import '../../node_modules/flatpickr/dist/flatpickr.min.css';
 
 const BLANK_POINT = {
   type: TYPES[0],
-  town: '',
   dateFrom: null,
   dateTo: null,
-  price: null,
+  price: 0,
   offers: [],
   destination: {
     description: '',
+    name: '',
     pictures: [],
   },
 };

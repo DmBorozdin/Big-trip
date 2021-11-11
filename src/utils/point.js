@@ -11,15 +11,15 @@ export const isPointDateExpired = (date) => date === null ? false : dayjs(date).
 
 export const isPointDateFuture = (date) => date === null ? false : dayjs(date).isAfter(dayjs(), 'D') || dayjs(date).isSame(dayjs(), 'D');
 
-export const getDateInFormatHM = (date) => dayjs(date).format('HH:mm');
+export const getDateInFormatHM = (date) => date === null ? '' : dayjs(date).format('HH:mm');
 
-export const getDateInFormatDM = (date) => dayjs(date).format('D MMM');
+export const getDateInFormatDM = (date) => date === null ? '' : dayjs(date).format('D MMM');
 
-export const getDateInFormatMD = (date) => dayjs(date).format('MMM D');
+export const getDateInFormatMD = (date) => date === null ? '' : dayjs(date).format('MMM D');
 
-export const getDateInFormatYMD = (date) => dayjs(date).format('YYYY-MM-DD');
+export const getDateInFormatYMD = (date) => date === null ? '' : dayjs(date).format('YYYY-MM-DD');
 
-export const getDateInFullFormat = (date) => dayjs(date).format('DD/MM/YY HH:mm');
+export const getDateInFullFormat = (date) => date === null ? '' : dayjs(date).format('DD/MM/YY HH:mm');
 
 export const calculateDateDifference = (dateTo, dateFrom) => {
   const differenceInMinute = dayjs(dateTo).diff(dayjs(dateFrom), 'm');
