@@ -21,6 +21,8 @@ export const getDateInFormatYMD = (date) => date === null ? '' : dayjs(date).for
 
 export const getDateInFullFormat = (date) => date === null ? '' : dayjs(date).format('DD/MM/YY HH:mm');
 
+export const getCurrentDate = () => dayjs().toDate();
+
 export const calculateDateDifference = (dateTo, dateFrom) => {
   const differenceInMinute = dayjs(dateTo).diff(dayjs(dateFrom), 'm');
   let difference = differenceInMinute;

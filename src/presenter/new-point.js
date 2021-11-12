@@ -11,9 +11,8 @@ export default class PointNew {
     this._pointEditComponent = null;
 
     this._handleFormSubmit = this._handleFormSubmit.bind(this);
-    this._handleRollupClick = this._handleRollupClick.bind(this);
     this._escKeyDownHandler = this._escKeyDownHandler.bind(this);
-    this._handleDeleteClick = this._handleDeleteClick.bind(this);
+    this._handleCancelClick = this._handleCancelClick.bind(this);
   }
 
   init(allOffers, allDestinations) {
@@ -23,11 +22,10 @@ export default class PointNew {
     this._allOffers = allOffers;
     this._allDestinations = allDestinations;
 
-    this._pointEditComponent = new PointEditView(undefined, this._allOffers, this._allDestinations);
+    this._pointEditComponent = new PointEditView(undefined, this._allOffers, this._allDestinations, true);
 
     this._pointEditComponent.setFormSubmitHandler(this._handleFormSubmit);
-    this._pointEditComponent.setRollupClickHandler(this._handleRollupClick);
-    this._pointEditComponent.setDeleteClickHandler(this._handleDeleteClick);
+    this._pointEditComponent.setDeleteClickHandler(this._handleCancelClick);
 
     render(this._tripListContainer, this._pointEditComponent, RenderPosition.AFTERBEGIN);
 
@@ -61,11 +59,7 @@ export default class PointNew {
     this.destroy();
   }
 
-  _handleRollupClick() {
-    this.destroy();
-  }
-
-  _handleDeleteClick() {
+  _handleCancelClick() {
     this.destroy();
   }
 }

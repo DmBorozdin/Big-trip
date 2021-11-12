@@ -1,15 +1,16 @@
-import { getDateInFullFormat, isDay1AfterDay2 } from '../utils/point.js';
+import { getDateInFullFormat, isDay1AfterDay2, getCurrentDate } from '../utils/point.js';
 import Smart from './smart.js';
 import { TYPES, TOWNS } from '../const.js';
 import flatpickr from 'flatpickr';
+import he from 'he';
 
 import '../../node_modules/flatpickr/dist/flatpickr.min.css';
 
 const BLANK_POINT = {
   type: TYPES[0],
-  dateFrom: null,
-  dateTo: null,
-  price: 0,
+  dateFrom: getCurrentDate(),
+  dateTo: getCurrentDate(),
+  price: '',
   offers: [],
   destination: {
     description: '',
@@ -72,7 +73,7 @@ ${pictures.length !== 0 ? `<div class="event__photos-container">
 </div>` : ''}
 </section>` : '';
 
-const createPointEditTemplate = (data) => {
+const createPointEditTemplate = (data, isNewPoint) => {
   const { type, dateFrom, dateTo, price, offers, destination, allOffers } = data;
 
   const dateFromFormat = getDateInFullFormat(dateFrom);
@@ -85,7 +86,7 @@ const createPointEditTemplate = (data) => {
   const destinationTemplate = createPointEditDestinationTemplate(destination);
 
   return `<li class="trip-events__item">
-    <form class="event event--edit" action="#" method="post">
+    <form class="event event--edit" action="#" method="post" autocomplete="off">
       <header class="event__header">
         <div class="event__type-wrapper">
           <label class="event__type  event__type-btn" for="event-type-toggle-1">
@@ -100,7 +101,7 @@ const createPointEditTemplate = (data) => {
           <label class="event__label  event__type-output" for="event-destination-1">
           ${type}
           </label>
-          <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${destination.name}" list="destination-list-1">
+          <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${he.encode(destination.name)}" list="destination-list-1" required>
           ${destinationListTemplate}
         </div>
 
@@ -117,14 +118,12 @@ const createPointEditTemplate = (data) => {
             <span class="visually-hidden">Price</span>
             &euro;
           </label>
-          <input class="event__input  event__input--price" id="event-price-1" type="text" name="event-price" value="${price}">
+          <input class="event__input  event__input--price" id="event-price-1" type="number" name="event-price" value="${price}" required>
         </div>
 
         <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
-        <button class="event__reset-btn" type="reset">Delete</button>
-        <button class="event__rollup-btn" type="button">
-          <span class="visually-hidden">Open event</span>
-        </button>
+        <button class="event__reset-btn" type="reset">${ isNewPoint ? 'Cancel' : 'Delete'}</button>
+        ${ !isNewPoint ? '<button class="event__rollup-btn" type="button"><span class="visually-hidden">Open event</span></button>' : ''}
       </header>
       <section class="event__details">
         ${offerTemplate}
@@ -135,9 +134,10 @@ const createPointEditTemplate = (data) => {
 };
 
 export default class PointEdit extends Smart {
-  constructor(point = BLANK_POINT, allOffers, allDestinations) {
+  constructor(point = BLANK_POINT, allOffers, allDestinations, isNewPoint = false) {
     super();
     this._data = PointEdit.parsePointToData(point, allOffers, allDestinations);
+    this._isNewPoint = isNewPoint;
     this._datepickerFrom = null;
     this._datepickerTo = null;
 
@@ -148,6 +148,7 @@ export default class PointEdit extends Smart {
     this._offerChangeHandler = this._offerChangeHandler.bind(this);
     this._dateFromChangeHandler = this._dateFromChangeHandler.bind(this);
     this._dateToChangeHandler = this._dateToChangeHandler.bind(this);
+    this._priceChangeHandler = this._priceChangeHandler.bind(this);
     this._formDeleteClickHandler = this._formDeleteClickHandler.bind(this);
 
     this._setInnerHandlers();
@@ -174,14 +175,16 @@ export default class PointEdit extends Smart {
   }
 
   getTemplate() {
-    return createPointEditTemplate(this._data);
+    return createPointEditTemplate(this._data, this._isNewPoint);
   }
 
   restoreHandlers() {
     this._setInnerHandlers();
     this._setDatepicker();
     this.setFormSubmitHandler(this._callback.formSubmit);
-    this.setRollupClickHandler(this._callback.rollupClick);
+    if (!this._isNewPoint) {
+      this.setRollupClickHandler(this._callback.rollupClick);
+    }
     this.setDeleteClickHandler(this._callback.deleteClick);
   }
 
@@ -220,6 +223,7 @@ export default class PointEdit extends Smart {
   _setInnerHandlers() {
     this.getElement().querySelector('.event__type-group').addEventListener('change', this._typeChangeHandler);
     this.getElement().querySelector('.event__input--destination').addEventListener('change', this._destinationInputHandler);
+    this.getElement().querySelector('.event__input--price').addEventListener('input', this._priceChangeHandler);
     const offersCollection = this.getElement().querySelectorAll('.event__offer-selector');
     for (const offer of offersCollection) {
       offer.addEventListener('change', this._offerChangeHandler);
@@ -274,6 +278,13 @@ export default class PointEdit extends Smart {
     this.updateData({
       dateTo: userDate,
     });
+  }
+
+  _priceChangeHandler(evt) {
+    evt.preventDefault();
+    this.updateData({
+      price: evt.target.value,
+    }, true);
   }
 
   _formSubmitHandler(evt) {

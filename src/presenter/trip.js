@@ -1,6 +1,5 @@
 import SortView from '../view/sort.js';
 import TripListView from '../view/trip-list.js';
-// import { createNewPoint } from '../view/new-point.js';
 import EmptyListView from '../view/list-empty.js';
 import PointPresenter from './point.js';
 import NewPointPresenter from './new-point.js';
