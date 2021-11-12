@@ -283,7 +283,7 @@ export default class PointEdit extends Smart {
   _priceChangeHandler(evt) {
     evt.preventDefault();
     this.updateData({
-      price: evt.target.value,
+      price: Number(evt.target.value),
     }, true);
   }
 

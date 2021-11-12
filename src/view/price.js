@@ -5,19 +5,18 @@ const createPriceTemplate = (points) => {
     const totalOfferPrice = point.offers.length > 0 ? point.offers.reduce((offerAccumulator, offer) => offerAccumulator + offer.price, 0) : 0;
     return accumulator + point.price + totalOfferPrice;
   }, 0);
-
   return `<p class="trip-info__cost">
   Total: &euro;&nbsp;<span class="trip-info__cost-value">${totalPrice}</span>
 </p>`;
 };
 
 export default class Price extends Abstract {
-  constructor(price) {
+  constructor(points) {
     super();
-    this._price = price;
+    this._points = points;
   }
 
   getTemplate() {
-    return createPriceTemplate(this._price);
+    return createPriceTemplate(this._points);
   }
 }
