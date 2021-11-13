@@ -6,6 +6,8 @@ import FilterPresenter from './presenter/filter.js';
 import { OFFERS } from './const.js';
 import PointsModel from './model/points.js';
 import FilterModel from './model/filter.js';
+import OffersModel from './model/offers.js';
+import DestinationsModel from './model/destinations.js';
 import { render, RenderPosition } from './utils/render.js';
 
 
@@ -15,6 +17,10 @@ const points = new Array(POINT_COUNT).fill(null).map(generatePoint);
 const pointsModel = new PointsModel();
 pointsModel.setPoints(points);
 const filterModel = new FilterModel();
+const offersModel = new OffersModel();
+offersModel.setOffers(OFFERS);
+const destinationsModel = new DestinationsModel();
+destinationsModel.setDestinations(Destinations);
 
 const pageHeader = document.querySelector('.page-header');
 const tripMain = pageHeader.querySelector('.trip-main');
@@ -25,7 +31,7 @@ const tripEvent = document.querySelector('.trip-events');
 render(tripNavigation, new MenuView(), RenderPosition.BEFOREEND);
 
 const tripInfoPresenter = new TripInfoPresenter(tripMain, pointsModel);
-const tripPresenter = new TripPresenter(tripEvent, pointsModel, filterModel, OFFERS, Destinations);
+const tripPresenter = new TripPresenter(tripEvent, pointsModel, filterModel, offersModel, destinationsModel);
 const filterPresenter = new FilterPresenter(tripFilter, filterModel);
 
 tripInfoPresenter.init();

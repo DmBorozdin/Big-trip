@@ -10,10 +10,12 @@ const Mode = {
 };
 
 export default class Point {
-  constructor(tripListContainer, changeData, changeMode) {
+  constructor(tripListContainer, changeData, changeMode, offersModel, destinationsModel) {
     this._tripListContainer = tripListContainer;
     this._changeData = changeData;
     this._changeMode = changeMode;
+    this._offersModel = offersModel;
+    this._destinationsModel = destinationsModel;
 
     this._pointComponent = null;
     this._pointEditComponent = null;
@@ -27,17 +29,15 @@ export default class Point {
     this._handleDeleteClick = this._handleDeleteClick.bind(this);
   }
 
-  init(point, allOffers, allDestinations) {
+  init(point) {
     this._point = point;
-    this._allOffers = allOffers;
-    this._allDestinations = allDestinations;
     this._currentPointType = this._point.type;
 
     const prevPointComponent = this._pointComponent;
     const prevPointEditComponent = this._pointEditComponent;
 
     this._pointComponent = new PointView(point);
-    this._pointEditComponent = new PointEditView(point, this._allOffers, this._allDestinations);
+    this._pointEditComponent = new PointEditView(point, this._offersModel, this._destinationsModel);
 
     this._pointComponent.setRollupClickHandler(this._handleExpandClick);
     this._pointComponent.setFavoriteClickHandler(this._handleFavoriteClick);
@@ -89,7 +89,7 @@ export default class Point {
   _escKeyDownHandler(evt) {
     if (evt.key === 'Escape' || evt.key === 'Esc') {
       evt.preventDefault();
-      this._pointEditComponent.reset(this._point, this._allOffers, this._allDestinations);
+      this._pointEditComponent.reset(this._point);
       this._replaceFormToPoint();
     }
   }
@@ -117,7 +117,7 @@ export default class Point {
   }
 
   _handleRollupClick() {
-    this._pointEditComponent.reset(this._point, this._allOffers, this._allDestinations);
+    this._pointEditComponent.reset(this._point);
     this._replaceFormToPoint();
   }
 

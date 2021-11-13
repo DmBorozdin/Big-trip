@@ -9,12 +9,12 @@ import { filter } from '../utils/filter.js';
 import { AvailableSortType, UpdateType, UserAction, FilterType} from '../const.js';
 
 export default class Trip {
-  constructor(tripContainer, pointsModel, filterModel, offers, destinations) {
+  constructor(tripContainer, pointsModel, filterModel, offersModel, destinationsModel) {
     this._tripContainer = tripContainer;
     this._pointsModel = pointsModel;
     this._filterModel = filterModel;
-    this._offers = offers.slice();
-    this._destinations = destinations.slice();
+    this._offersModel = offersModel;
+    this._destinationsModel = destinationsModel;
     this._pointPresenter = {};
     this._currentSortType = AvailableSortType.DAY;
 
@@ -30,7 +30,7 @@ export default class Trip {
     this._pointsModel.addObserver(this._handleModelEvent);
     this._filterModel.addObserver(this._handleModelEvent);
 
-    this._newPointPresenter = new NewPointPresenter(this._tripListComponent, this._handleViewAction);
+    this._newPointPresenter = new NewPointPresenter(this._tripListComponent, this._handleViewAction, this._offersModel, this._destinationsModel);
   }
 
   init() {
@@ -41,7 +41,7 @@ export default class Trip {
   createPoint() {
     this._currentSortType = AvailableSortType.DAY;
     this._filterModel.setFilter(UpdateType.MAJOR, FilterType.EVERYTHING);
-    this._newPointPresenter.init(this._offers, this._destinations);
+    this._newPointPresenter.init();
   }
 
   _getPoints() {
@@ -83,7 +83,7 @@ export default class Trip {
   _handleModelEvent(updateType, data) {
     switch(updateType) {
       case UpdateType.PATCH:
-        this._pointPresenter[data.id].init(data, this._offers, this._destinations);
+        this._pointPresenter[data.id].init(data);
         break;
       case UpdateType.MINOR:
         this._clearTripBoard();
@@ -115,8 +115,8 @@ export default class Trip {
   }
 
   _renderPoint(point) {
-    const pointPresenter = new PointPresenter(this._tripListComponent, this._handleViewAction, this._handleModeChange);
-    pointPresenter.init(point, this._offers, this._destinations);
+    const pointPresenter = new PointPresenter(this._tripListComponent, this._handleViewAction, this._handleModeChange, this._offersModel, this._destinationsModel);
+    pointPresenter.init(point);
     this._pointPresenter[point.id] = pointPresenter;
   }
 

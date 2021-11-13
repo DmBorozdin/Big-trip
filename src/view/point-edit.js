@@ -41,10 +41,10 @@ const createPointEditDestinationListTemplate = () =>  `<datalist id="destination
       ${TOWNS.map((town) => `<option value="${town}"></option>`).join('')}
     </datalist>`;
 
-const createPointEditOfferTemplate = (allOffers, offers) => allOffers.length !==0 ? `<section class="event__section  event__section--offers">
+const createPointEditOfferTemplate = (allOffersForType, offers) => allOffersForType.length !==0 ? `<section class="event__section  event__section--offers">
   <h3 class="event__section-title  event__section-title--offers">Offers</h3>
   <div class="event__available-offers">
-    ${allOffers.map(({title, price}, index) =>
+    ${allOffersForType.map(({title, price}, index) =>
     `<div class="event__offer-selector">
       <input class="event__offer-checkbox
         visually-hidden"
@@ -74,15 +74,14 @@ ${pictures.length !== 0 ? `<div class="event__photos-container">
 </section>` : '';
 
 const createPointEditTemplate = (data, isNewPoint) => {
-  const { type, dateFrom, dateTo, price, offers, destination, allOffers } = data;
+  const { type, dateFrom, dateTo, price, offers, destination, allOffersForType } = data;
 
   const dateFromFormat = getDateInFullFormat(dateFrom);
   const dateToFormat = getDateInFullFormat(dateTo);
-  const allOffersForCurrentPointType = allOffers.find((offer) => offer.type === type).offers;
 
   const typeListTemplate = createPointEditTypeListTemplate(type);
   const destinationListTemplate = createPointEditDestinationListTemplate();
-  const offerTemplate = createPointEditOfferTemplate(allOffersForCurrentPointType, offers);
+  const offerTemplate = createPointEditOfferTemplate(allOffersForType, offers);
   const destinationTemplate = createPointEditDestinationTemplate(destination);
 
   return `<li class="trip-events__item">
@@ -134,9 +133,11 @@ const createPointEditTemplate = (data, isNewPoint) => {
 };
 
 export default class PointEdit extends Smart {
-  constructor(point = BLANK_POINT, allOffers, allDestinations, isNewPoint = false) {
+  constructor(point = BLANK_POINT, offersModel, destinationsModel, isNewPoint = false) {
     super();
-    this._data = PointEdit.parsePointToData(point, allOffers, allDestinations);
+    this._data = PointEdit.parsePointToData(point, offersModel.getOffersForType(point.type));
+    this._offersModel = offersModel;
+    this._destinationsModel = destinationsModel;
     this._isNewPoint = isNewPoint;
     this._datepickerFrom = null;
     this._datepickerTo = null;
@@ -168,9 +169,9 @@ export default class PointEdit extends Smart {
     }
   }
 
-  reset(point, allOffers, allDestinations) {
+  reset(point) {
     this.updateData(
-      PointEdit.parsePointToData(point, allOffers, allDestinations),
+      PointEdit.parsePointToData(point, this._offersModel.getOffersForType(point.type)),
     );
   }
 
@@ -232,7 +233,7 @@ export default class PointEdit extends Smart {
 
   _destinationInputHandler(evt) {
     evt.preventDefault();
-    let newDestination = this._data.allDestinations.find((destination) => destination.name === evt.target.value);
+    let newDestination = this._destinationsModel.getDestinationsDescription(evt.target.value);
     if (newDestination === undefined) {
       newDestination = {
         description: '',
@@ -250,13 +251,13 @@ export default class PointEdit extends Smart {
     this.updateData({
       type: evt.target.value,
       offers: [],
+      allOffersForType: this._offersModel.getOffersForType(evt.target.value),
     });
   }
 
   _offerChangeHandler(evt) {
     evt.preventDefault();
-    const allOffersForCurrentPointType = this._data.allOffers.find((offer) => offer.type === this._data.type).offers;
-    const targetOffer = allOffersForCurrentPointType.find((offer) => offer.title === evt.target.name.slice(12));
+    const targetOffer = this._data.allOffersForType.find((offer) => offer.title === evt.target.name.slice(12));
     if (evt.target.checked) {
       this.updateData({
         offers: this._data.offers.concat(targetOffer),
@@ -322,20 +323,18 @@ export default class PointEdit extends Smart {
     this.getElement().querySelector('.event__reset-btn').addEventListener('click', this._formDeleteClickHandler);
   }
 
-  static parsePointToData(point, allOffers, allDestinations) {
+  static parsePointToData(point, allOffersForType) {
     return Object.assign(
       {},
       point,
       {
-        allOffers,
-        allDestinations,
+        allOffersForType,
       });
   }
 
   static parseDataToPoint(data) {
     data = Object.assign({}, data);
-    delete data.allOffers;
-    delete data.allDestinations;
+    delete data.allOffersForType;
     return data;
   }
 }
