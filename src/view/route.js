@@ -5,7 +5,7 @@ const TOWNS_COUNT = 3;
 
 const createRouteTemplate = (points) => {
   const firstDate = getDateInFormatDM(points[0].dateFrom);
-  const lastDate = getDateInFormatDM(points[points.length - 1].dateFrom);
+  const lastDate = getDateInFormatDM(points[points.length - 1].dateTo);
   const towns = Array.from(new Set(points.map((point) => point.destination.name)));
 
   return `<div class="trip-info__main">

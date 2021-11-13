@@ -1,6 +1,8 @@
 import PointView from '../view/point.js';
 import PointEditView from '../view/point-edit.js';
 import { render, RenderPosition, replace, remove} from '../utils/render.js';
+import { UserAction, UpdateType } from '../const.js';
+import { isDatesEqual } from '../utils/point.js';
 
 const Mode = {
   DEFAULT: 'DEFAULT',
@@ -8,10 +10,12 @@ const Mode = {
 };
 
 export default class Point {
-  constructor(tripListContainer, changeData, changeMode) {
+  constructor(tripListContainer, changeData, changeMode, offersModel, destinationsModel) {
     this._tripListContainer = tripListContainer;
     this._changeData = changeData;
     this._changeMode = changeMode;
+    this._offersModel = offersModel;
+    this._destinationsModel = destinationsModel;
 
     this._pointComponent = null;
     this._pointEditComponent = null;
@@ -22,24 +26,24 @@ export default class Point {
     this._handleFormSubmit = this._handleFormSubmit.bind(this);
     this._handleRollupClick = this._handleRollupClick.bind(this);
     this._escKeyDownHandler = this._escKeyDownHandler.bind(this);
+    this._handleDeleteClick = this._handleDeleteClick.bind(this);
   }
 
-  init(point, allOffers, allDestinations) {
+  init(point) {
     this._point = point;
-    this._allOffers = allOffers;
-    this._allDestinations = allDestinations;
     this._currentPointType = this._point.type;
 
     const prevPointComponent = this._pointComponent;
     const prevPointEditComponent = this._pointEditComponent;
 
     this._pointComponent = new PointView(point);
-    this._pointEditComponent = new PointEditView(point, this._allOffers, this._allDestinations);
+    this._pointEditComponent = new PointEditView(point, this._offersModel, this._destinationsModel);
 
     this._pointComponent.setRollupClickHandler(this._handleExpandClick);
     this._pointComponent.setFavoriteClickHandler(this._handleFavoriteClick);
     this._pointEditComponent.setFormSubmitHandler(this._handleFormSubmit);
     this._pointEditComponent.setRollupClickHandler(this._handleRollupClick);
+    this._pointEditComponent.setDeleteClickHandler(this._handleDeleteClick);
 
     if (prevPointComponent === null || prevPointEditComponent === null ){
       render(this._tripListContainer, this._pointComponent, RenderPosition.BEFOREEND);
@@ -85,7 +89,7 @@ export default class Point {
   _escKeyDownHandler(evt) {
     if (evt.key === 'Escape' || evt.key === 'Esc') {
       evt.preventDefault();
-      this._pointEditComponent.reset(this._point, this._allOffers, this._allDestinations);
+      this._pointEditComponent.reset(this._point);
       this._replaceFormToPoint();
     }
   }
@@ -96,17 +100,28 @@ export default class Point {
 
   _handleFavoriteClick() {
     this._changeData(
+      UserAction.UPDATE_POINT,
+      UpdateType.PATCH,
       Object.assign({}, this._point, {isFavorite: !this._point.isFavorite}),
     );
   }
 
-  _handleFormSubmit(point) {
-    this._changeData(point);
+  _handleFormSubmit(update) {
+    const isMinorUpdate = !isDatesEqual(this._point.dateFrom, update.dateFrom) || !isDatesEqual(this._point.dateTo, update.dateTo) || this._point.price !== update.price;
+    this._changeData(
+      UserAction.UPDATE_POINT,
+      isMinorUpdate ? UpdateType.MINOR : UpdateType.PATCH,
+      update,
+    );
     this._replaceFormToPoint();
   }
 
   _handleRollupClick() {
-    this._pointEditComponent.reset(this._point, this._allOffers, this._allDestinations);
+    this._pointEditComponent.reset(this._point);
     this._replaceFormToPoint();
+  }
+
+  _handleDeleteClick(point) {
+    this._changeData(UserAction.DELETE_POINT, UpdateType.MINOR, point);
   }
 }
