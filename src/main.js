@@ -9,6 +9,7 @@ import FilterModel from './model/filter.js';
 import OffersModel from './model/offers.js';
 import DestinationsModel from './model/destinations.js';
 import { render, RenderPosition } from './utils/render.js';
+import { MenuItem } from './const.js';
 
 
 const POINT_COUNT = 10;
@@ -27,12 +28,26 @@ const tripMain = pageHeader.querySelector('.trip-main');
 const tripNavigation = pageHeader.querySelector('.trip-controls__navigation');
 const tripFilter = pageHeader.querySelector('.trip-controls__filters');
 const tripEvent = document.querySelector('.trip-events');
+const menuComponent = new MenuView();
 
-render(tripNavigation, new MenuView(), RenderPosition.BEFOREEND);
+render(tripNavigation, menuComponent, RenderPosition.BEFOREEND);
 
 const tripInfoPresenter = new TripInfoPresenter(tripMain, pointsModel);
 const tripPresenter = new TripPresenter(tripEvent, pointsModel, filterModel, offersModel, destinationsModel);
 const filterPresenter = new FilterPresenter(tripFilter, filterModel);
+
+const handleMenuClick = (menuItem) => {
+  switch(menuItem) {
+    case MenuItem.TABLE:
+
+    break;
+    case MenuItem.STATS:
+
+    break;
+  }
+};
+
+menuComponent.setMenuClickHandler(handleMenuClick);
 
 tripInfoPresenter.init();
 filterPresenter.init();

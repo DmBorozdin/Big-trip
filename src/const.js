@@ -16,6 +16,11 @@ export const AvailableSortType = {
   PRICE: 'price',
 };
 
+export const MenuItem = {
+  TABLE: 'table',
+  STATS: 'stats',
+};
+
 export const UserAction = {
   UPDATE_POINT: 'UPDATE_POINT',
   ADD_POINT: 'ADD_POINT',
