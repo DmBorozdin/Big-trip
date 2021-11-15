@@ -9,7 +9,7 @@ import FilterModel from './model/filter.js';
 import OffersModel from './model/offers.js';
 import DestinationsModel from './model/destinations.js';
 import { render, RenderPosition } from './utils/render.js';
-import { MenuItem } from './const.js';
+import { MenuItem, UpdateType, FilterType } from './const.js';
 
 
 const POINT_COUNT = 10;
@@ -39,11 +39,16 @@ const filterPresenter = new FilterPresenter(tripFilter, filterModel);
 const handleMenuClick = (menuItem) => {
   switch(menuItem) {
     case MenuItem.TABLE:
-
-    break;
+      tripPresenter.init();
+      break;
     case MenuItem.STATS:
-
-    break;
+      tripPresenter.destroy();
+      break;
+    case MenuItem.ADD_NEW_POINT:
+      tripPresenter.destroy();
+      filterModel.setFilter(UpdateType.MAJOR, FilterType.EVERYTHING);
+      tripPresenter.init();
+      break;
   }
 };
 
