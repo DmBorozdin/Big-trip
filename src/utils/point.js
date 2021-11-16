@@ -1,6 +1,5 @@
 import dayjs from 'dayjs';
 
-const MILLISEK_IN_MINUTE = 60000;
 const MINUTE_IN_HOUR = 60;
 const MINUTE_IN_DAY = 1440;
 
@@ -24,22 +23,19 @@ export const getDateInFullFormat = (date) => date === null ? '' : dayjs(date).fo
 
 export const getCurrentDate = () => dayjs().toDate();
 
-export const calculateDateDifferenceIn = (dateTo, dateFrom) => dayjs(dateTo).diff(dayjs(dateFrom));
+export const calculateDateDifferenceInMinute = (dateTo, dateFrom) => dayjs(dateTo).diff(dayjs(dateFrom), 'm');
 
-export const calculateDateDifference = (dateTo, dateFrom) => {
-  const differenceInMilliSek = dayjs(dateTo).diff(dayjs(dateFrom));
-  // const differenceInMinute = dayjs(dateTo).diff(dayjs(dateFrom), 'm');
-  const differenceInMinute = differenceInMilliSek/MILLISEK_IN_MINUTE;
+export const formatDateDifference = (differenceInMinute) => {
   let difference = differenceInMinute;
-  if (differenceInMinute < MINUTE_IN_HOUR) {
+  if (differenceInMinute <= MINUTE_IN_HOUR) {
     difference = `${differenceInMinute}M`;
-  } else if (differenceInMinute < MINUTE_IN_DAY) {
-    const differenceInHour = dayjs(dateTo).diff(dayjs(dateFrom), 'h');
+  } else if (differenceInMinute <= MINUTE_IN_DAY) {
+    const differenceInHour = Math.floor(differenceInMinute/MINUTE_IN_HOUR);
     const leftDifferenceInMinute = differenceInMinute - differenceInHour*MINUTE_IN_HOUR;
     difference = differenceInHour < 10 ? `0${differenceInHour}H` : `${differenceInHour}H`;
     difference = leftDifferenceInMinute < 10 ? `${difference} 0${leftDifferenceInMinute}M` : `${difference} ${leftDifferenceInMinute}M`;
   } else {
-    const differenceInDay = dayjs(dateTo).diff(dayjs(dateFrom), 'd');
+    const differenceInDay = Math.floor(differenceInMinute/MINUTE_IN_DAY);
     const leftDifferenceInHour =Math.floor((differenceInMinute - differenceInDay*MINUTE_IN_DAY)/MINUTE_IN_HOUR);
     const leftDifferenceInMinute = differenceInMinute - differenceInDay*MINUTE_IN_DAY - leftDifferenceInHour*MINUTE_IN_HOUR;
     difference = differenceInDay < 10 ? `0${differenceInDay}D` : `${differenceInDay}D`;
@@ -47,6 +43,11 @@ export const calculateDateDifference = (dateTo, dateFrom) => {
     difference = leftDifferenceInMinute < 10 ? `${difference} 0${leftDifferenceInMinute}M` : `${difference} ${leftDifferenceInMinute}M`;
   }
   return difference;
+};
+
+export const calculateDateDifference = (dateTo, dateFrom) => {
+  const differenceInMinute = calculateDateDifferenceInMinute(dateTo, dateFrom);
+  return formatDateDifference(differenceInMinute);
 };
 
 const getWeightForNullValue = (valueA, valueB) => {

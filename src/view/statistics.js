@@ -1,20 +1,26 @@
 import Abstract from './abstract.js';
 import Chart from 'chart.js';
 import ChartDataLabels from 'chartjs-plugin-datalabels';
-import { makeItemsUniq, pointSumPriceByType, countPointsByType } from '../utils/statistics.js';
-import {calculateDateDifference } from '../utils/point.js';
+import { makeItemsUniq, pointSumPriceByType, pointSumTimeSpendByType, countPointsByType } from '../utils/statistics.js';
+import { formatDateDifference, sortPointByPrice } from '../utils/point.js';
 
 const renderMoneyChart = (moneyCtx, points) => {
   const pointTypes = points.map((point) => point.type);
   const uniqPointTypes = makeItemsUniq(pointTypes);
-  const sumPriceByTypes = uniqPointTypes.map((type) => pointSumPriceByType(points, type));
+  const uniqPoints = uniqPointTypes.map((type) => ({
+    type,
+    price: pointSumPriceByType(points, type),
+  }));
+  const sortUniqPointsByPrice = uniqPoints.sort(sortPointByPrice);
+  const sortUniqPointTypes = sortUniqPointsByPrice.map((point) => point.type);
+  const sortUniqPointPrices = sortUniqPointsByPrice.map((point) => point.price);
   return new Chart(moneyCtx, {
     plugins: [ChartDataLabels],
     type: 'horizontalBar',
     data: {
-      labels: uniqPointTypes,
+      labels: sortUniqPointTypes,
       datasets: [{
-        data: sumPriceByTypes,
+        data: sortUniqPointPrices,
         backgroundColor: '#ffffff',
         hoverBackgroundColor: '#ffffff',
         anchor: 'start',
@@ -147,16 +153,14 @@ const renderTypeChart = (typeCtx, points) => {
 const renderTymeSpendChart = (timeCtx, points) => {
   const pointTypes = points.map((point) => point.type);
   const uniqPointTypes = makeItemsUniq(pointTypes);
-  const differencePointTypes = points.map((point) => calculateDateDifference(point.dateTo, point.dateFrom));
-  console.log(differencePointTypes);
-  const sumPriceByTypes = uniqPointTypes.map((type) => pointSumPriceByType(points, type));
+  const tymeSpendUniqPoints = uniqPointTypes.map((type) => pointSumTimeSpendByType(points, type));
   return new Chart(timeCtx, {
     plugins: [ChartDataLabels],
     type: 'horizontalBar',
     data: {
       labels: uniqPointTypes,
       datasets: [{
-        data: sumPriceByTypes,
+        data: tymeSpendUniqPoints,
         backgroundColor: '#ffffff',
         hoverBackgroundColor: '#ffffff',
         anchor: 'start',
@@ -171,7 +175,7 @@ const renderTymeSpendChart = (timeCtx, points) => {
           color: '#000000',
           anchor: 'end',
           align: 'start',
-          formatter: (val) => `€ ${val}`,
+          formatter: (val) => `${formatDateDifference(val)}`,
         },
       },
       title: {
@@ -203,7 +207,7 @@ const renderTymeSpendChart = (timeCtx, points) => {
             display: false,
             drawBorder: false,
           },
-          minBarLength: 50,
+          minBarLength: 70,
         }],
       },
       legend: {
