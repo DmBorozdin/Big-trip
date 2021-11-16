@@ -19,7 +19,6 @@ export const AvailableSortType = {
 export const MenuItem = {
   TABLE: 'table',
   STATS: 'stats',
-  ADD_NEW_POINT: 'ADD_NEW_POINT',
 };
 
 export const UserAction = {

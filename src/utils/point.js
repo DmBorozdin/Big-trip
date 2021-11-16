@@ -1,5 +1,6 @@
 import dayjs from 'dayjs';
 
+const MILLISEK_IN_MINUTE = 60000;
 const MINUTE_IN_HOUR = 60;
 const MINUTE_IN_DAY = 1440;
 
@@ -23,8 +24,12 @@ export const getDateInFullFormat = (date) => date === null ? '' : dayjs(date).fo
 
 export const getCurrentDate = () => dayjs().toDate();
 
+export const calculateDateDifferenceIn = (dateTo, dateFrom) => dayjs(dateTo).diff(dayjs(dateFrom));
+
 export const calculateDateDifference = (dateTo, dateFrom) => {
-  const differenceInMinute = dayjs(dateTo).diff(dayjs(dateFrom), 'm');
+  const differenceInMilliSek = dayjs(dateTo).diff(dayjs(dateFrom));
+  // const differenceInMinute = dayjs(dateTo).diff(dayjs(dateFrom), 'm');
+  const differenceInMinute = differenceInMilliSek/MILLISEK_IN_MINUTE;
   let difference = differenceInMinute;
   if (differenceInMinute < MINUTE_IN_HOUR) {
     difference = `${differenceInMinute}M`;
