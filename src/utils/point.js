@@ -86,6 +86,10 @@ export const sortPointByPrice = (pointA, pointB) => {
   return pointB.price - pointA.price;
 };
 
+export const sortPointByCount = (pointA, pointB) => pointB.count - pointA.count;
+
+export const sortPointByTymeSpend = (pointA, pointB) => pointB.tymeSpend - pointA.tymeSpend;
+
 export const sortPointByDuration = (pointA, pointB) => {
   const pointADuration = dayjs(pointA.dateTo).diff(dayjs(pointA.dateFrom));
   const pointBDuration = dayjs(pointB.dateTo).diff(dayjs(pointB.dateFrom));

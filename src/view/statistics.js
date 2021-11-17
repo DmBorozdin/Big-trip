@@ -1,17 +1,11 @@
 import Abstract from './abstract.js';
 import Chart from 'chart.js';
 import ChartDataLabels from 'chartjs-plugin-datalabels';
-import { makeItemsUniq, pointSumPriceByType, pointSumTimeSpendByType, countPointsByType } from '../utils/statistics.js';
-import { formatDateDifference, sortPointByPrice } from '../utils/point.js';
+import { getUniqPoints } from '../utils/statistics.js';
+import { formatDateDifference, sortPointByPrice, sortPointByCount, sortPointByTymeSpend } from '../utils/point.js';
 
 const renderMoneyChart = (moneyCtx, points) => {
-  const pointTypes = points.map((point) => point.type);
-  const uniqPointTypes = makeItemsUniq(pointTypes);
-  const uniqPoints = uniqPointTypes.map((type) => ({
-    type,
-    price: pointSumPriceByType(points, type),
-  }));
-  const sortUniqPointsByPrice = uniqPoints.sort(sortPointByPrice);
+  const sortUniqPointsByPrice = points.slice().sort(sortPointByPrice);
   const sortUniqPointTypes = sortUniqPointsByPrice.map((point) => point.type);
   const sortUniqPointPrices = sortUniqPointsByPrice.map((point) => point.price);
   return new Chart(moneyCtx, {
@@ -81,16 +75,16 @@ const renderMoneyChart = (moneyCtx, points) => {
 };
 
 const renderTypeChart = (typeCtx, points) => {
-  const pointTypes = points.map((point) => point.type);
-  const uniqPointTypes = makeItemsUniq(pointTypes);
-  const pointCountsByType = uniqPointTypes.map((type) => countPointsByType(points, type));
+  const sortUniqPointsByCount = points.slice().sort(sortPointByCount);
+  const sortUniqPointTypes = sortUniqPointsByCount.map((point) => point.type);
+  const sortUniqPointCounts = sortUniqPointsByCount.map((point) => point.count);
   return new Chart(typeCtx, {
     plugins: [ChartDataLabels],
     type: 'horizontalBar',
     data: {
-      labels: uniqPointTypes,
+      labels: sortUniqPointTypes,
       datasets: [{
-        data: pointCountsByType,
+        data: sortUniqPointCounts,
         backgroundColor: '#ffffff',
         hoverBackgroundColor: '#ffffff',
         anchor: 'start',
@@ -151,16 +145,16 @@ const renderTypeChart = (typeCtx, points) => {
 };
 
 const renderTymeSpendChart = (timeCtx, points) => {
-  const pointTypes = points.map((point) => point.type);
-  const uniqPointTypes = makeItemsUniq(pointTypes);
-  const tymeSpendUniqPoints = uniqPointTypes.map((type) => pointSumTimeSpendByType(points, type));
+  const sortUniqPointsByTymeSpend = points.slice().sort(sortPointByTymeSpend);
+  const sortUniqPointTypes = sortUniqPointsByTymeSpend.map((point) => point.type);
+  const sortUniqPointCounts = sortUniqPointsByTymeSpend.map((point) => point.tymeSpend);
   return new Chart(timeCtx, {
     plugins: [ChartDataLabels],
     type: 'horizontalBar',
     data: {
-      labels: uniqPointTypes,
+      labels: sortUniqPointTypes,
       datasets: [{
-        data: tymeSpendUniqPoints,
+        data: sortUniqPointCounts,
         backgroundColor: '#ffffff',
         hoverBackgroundColor: '#ffffff',
         anchor: 'start',
@@ -262,16 +256,16 @@ export default class Statisctics extends Abstract {
     const typeCtx = this.getElement().querySelector('#type');
     const timeCtx = this.getElement().querySelector('#time-spend');
 
-    const pointTypes = this._points.map((point) => point.type);
-    const uniqPointTypesLength = makeItemsUniq(pointTypes).length - 1;
+    const uniqPoints = getUniqPoints(this._points);
+    const uniqPointsLength = uniqPoints.length - 1;
 
     const BAR_HEIGHT = 55;
-    moneyCtx.height =BAR_HEIGHT * uniqPointTypesLength;
-    typeCtx.height = BAR_HEIGHT * uniqPointTypesLength;
-    timeCtx.height = BAR_HEIGHT * uniqPointTypesLength;
+    moneyCtx.height =BAR_HEIGHT * uniqPointsLength;
+    typeCtx.height = BAR_HEIGHT * uniqPointsLength;
+    timeCtx.height = BAR_HEIGHT * uniqPointsLength;
 
-    this._moneyChart = renderMoneyChart(moneyCtx, this._points);
-    this._typeChart = renderTypeChart(typeCtx, this._points);
-    this._timeChart = renderTymeSpendChart(timeCtx, this._points);
+    this._moneyChart = renderMoneyChart(moneyCtx, uniqPoints);
+    this._typeChart = renderTypeChart(typeCtx, uniqPoints);
+    this._timeChart = renderTymeSpendChart(timeCtx, uniqPoints);
   }
 }

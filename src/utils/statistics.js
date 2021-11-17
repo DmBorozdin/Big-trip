@@ -13,3 +13,15 @@ export const pointSumTimeSpendByType = (points, type) => points.reduce((accumula
 }, 0);
 
 export const countPointsByType = (points, type) => points.filter((point) => point.type === type).length;
+
+export const getUniqPoints = (points) => {
+  const pointTypes = points.map((point) => point.type);
+  const uniqPointTypes = makeItemsUniq(pointTypes);
+  const uniqPoints = uniqPointTypes.map((type) => ({
+    type,
+    price: pointSumPriceByType(points, type),
+    count: countPointsByType(points, type),
+    tymeSpend: pointSumTimeSpendByType(points, type),
+  }));
+  return uniqPoints;
+};

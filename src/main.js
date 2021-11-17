@@ -9,7 +9,7 @@ import PointsModel from './model/points.js';
 import FilterModel from './model/filter.js';
 import OffersModel from './model/offers.js';
 import DestinationsModel from './model/destinations.js';
-import { render, RenderPosition } from './utils/render.js';
+import { render, RenderPosition, remove } from './utils/render.js';
 import { MenuItem } from './const.js';
 
 
@@ -32,9 +32,9 @@ const tripFilter = pageHeader.querySelector('.trip-controls__filters');
 const pageBodyContainer = document.querySelector('.page-body__page-main .page-body__container');
 const tripEvent = document.querySelector('.trip-events');
 const newPointButton = document.querySelector('.trip-main__event-add-btn');
-const menuComponent = new MenuView();
-
-render(tripNavigation, menuComponent, RenderPosition.BEFOREEND);
+let menuComponent = null;
+let renderMenu = null;
+let statisticsComponent = null;
 
 const tripInfoPresenter = new TripInfoPresenter(tripMain, pointsModel);
 const tripPresenter = new TripPresenter(tripEvent, pointsModel, filterModel, offersModel, destinationsModel);
@@ -47,23 +47,35 @@ const handleMenuClick = (menuItem) => {
   switch(menuItem) {
     case MenuItem.TABLE:
       tripPresenter.init();
+      remove(statisticsComponent);
       newPointButton.disabled = false;
+      renderMenu(MenuItem.TABLE);
       break;
     case MenuItem.STATS:
       tripPresenter.destroy();
+      statisticsComponent = new StatiscticsView(pointsModel.getPoints());
+      render(pageBodyContainer, statisticsComponent, RenderPosition.BEFOREEND);
       newPointButton.disabled = true;
+      renderMenu(MenuItem.STATS);
       break;
   }
   previousMenuItem = menuItem;
 };
 
-menuComponent.setMenuClickHandler(handleMenuClick);
+renderMenu = (currentMenuItem) => {
+  if (menuComponent !== null) {
+    remove(menuComponent);
+  }
+  menuComponent = new MenuView(currentMenuItem);
+  render(tripNavigation, menuComponent, RenderPosition.BEFOREEND);
+  menuComponent.setMenuClickHandler(handleMenuClick);
+};
+
+renderMenu(MenuItem.TABLE);
 
 tripInfoPresenter.init();
 filterPresenter.init();
 tripPresenter.init();
-
-render(pageBodyContainer, new StatiscticsView(pointsModel.getPoints()), RenderPosition.BEFOREEND);
 
 newPointButton.addEventListener('click', (evt) => {
   evt.preventDefault();
