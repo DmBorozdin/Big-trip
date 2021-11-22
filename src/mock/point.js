@@ -42,7 +42,10 @@ const generatePicture = () => {
   const pictures = pictureCount !==0 ? new Array(pictureCount).fill(null).map(() => {
     const maxPictureNumber = 100;
     const pictureNumber = getRandomInteger(0, maxPictureNumber);
-    return `http://picsum.photos/248/152?r=${pictureNumber}`;
+    return {
+      src: `http://picsum.photos/248/152?r=${pictureNumber}`,
+      description: 'foto',
+    };
   }) : [];
   return pictures;
 };

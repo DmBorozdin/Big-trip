@@ -68,7 +68,7 @@ ${description !== '' ? `<p class="event__destination-description">${description}
 
 ${pictures.length !== 0 ? `<div class="event__photos-container">
 <div class="event__photos-tape">
-  ${pictures.map((picture) => `<img class="event__photo" src="${picture}" alt="Event photo">`).join('')}
+  ${pictures.map((picture) => `<img class="event__photo" src="${picture.src}" alt="${picture.description}">`).join('')}
 </div>
 </div>` : ''}
 </section>` : '';

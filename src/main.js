@@ -1,24 +1,26 @@
 import MenuView from './view/menu.js';
 import StatiscticsView from './view/statistics.js';
 import TripInfoPresenter from './presenter/trip-info.js';
-import { generatePoint, Destinations } from './mock/point.js';
+import { Destinations } from './mock/point.js';
 import TripPresenter from './presenter/trip.js';
 import FilterPresenter from './presenter/filter.js';
-import { OFFERS } from './const.js';
+import { OFFERS, UpdateType } from './const.js';
 import PointsModel from './model/points.js';
 import FilterModel from './model/filter.js';
 import OffersModel from './model/offers.js';
 import DestinationsModel from './model/destinations.js';
 import { render, RenderPosition, remove } from './utils/render.js';
 import { MenuItem } from './const.js';
+import Api from './api.js';
 
+const AUTHORIZATION = 'Basic dhul3j7s92gk0l';
+const END_POINT = 'https://14.ecmascript.pages.academy/big-trip';
 
-const POINT_COUNT = 10;
-const points = new Array(POINT_COUNT).fill(null).map(generatePoint);
+const api = new Api(END_POINT, AUTHORIZATION);
+
 let previousMenuItem = null;
 
 const pointsModel = new PointsModel();
-pointsModel.setPoints(points);
 const filterModel = new FilterModel();
 const offersModel = new OffersModel();
 offersModel.setOffers(OFFERS);
@@ -81,3 +83,11 @@ newPointButton.addEventListener('click', (evt) => {
   evt.preventDefault();
   tripPresenter.createPoint();
 });
+
+api.getPoints()
+  .then((points) => {
+    pointsModel.setPoints(UpdateType.INIT, points);
+  })
+  .catch(() => {
+    pointsModel.setPoints(UpdateType.INIT, []);
+  });
