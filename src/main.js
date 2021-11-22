@@ -1,10 +1,9 @@
 import MenuView from './view/menu.js';
 import StatiscticsView from './view/statistics.js';
 import TripInfoPresenter from './presenter/trip-info.js';
-import { Destinations } from './mock/point.js';
 import TripPresenter from './presenter/trip.js';
 import FilterPresenter from './presenter/filter.js';
-import { OFFERS, UpdateType } from './const.js';
+import { UpdateType } from './const.js';
 import PointsModel from './model/points.js';
 import FilterModel from './model/filter.js';
 import OffersModel from './model/offers.js';
@@ -23,9 +22,7 @@ let previousMenuItem = null;
 const pointsModel = new PointsModel();
 const filterModel = new FilterModel();
 const offersModel = new OffersModel();
-offersModel.setOffers(OFFERS);
 const destinationsModel = new DestinationsModel();
-destinationsModel.setDestinations(Destinations);
 
 const pageHeader = document.querySelector('.page-header');
 const tripMain = pageHeader.querySelector('.trip-main');
@@ -39,7 +36,7 @@ let renderMenu = null;
 let statisticsComponent = null;
 
 const tripInfoPresenter = new TripInfoPresenter(tripMain, pointsModel);
-const tripPresenter = new TripPresenter(tripEvent, pointsModel, filterModel, offersModel, destinationsModel);
+const tripPresenter = new TripPresenter(tripEvent, pointsModel, filterModel, offersModel, destinationsModel, api);
 const filterPresenter = new FilterPresenter(tripFilter, filterModel);
 
 const handleMenuClick = (menuItem) => {
@@ -73,8 +70,6 @@ renderMenu = (currentMenuItem) => {
   menuComponent.setMenuClickHandler(handleMenuClick);
 };
 
-renderMenu(MenuItem.TABLE);
-
 tripInfoPresenter.init();
 filterPresenter.init();
 tripPresenter.init();
@@ -84,10 +79,20 @@ newPointButton.addEventListener('click', (evt) => {
   tripPresenter.createPoint();
 });
 
+api.getOffers()
+  .then((offers) => offersModel.setOffers(offers))
+  .catch(() => offersModel.setOffers([]));
+
+api.getDestinations()
+  .then((destinations) => destinationsModel.setDestinations(destinations))
+  .catch(() => destinationsModel.setDestinations([]));
+
 api.getPoints()
   .then((points) => {
     pointsModel.setPoints(UpdateType.INIT, points);
+    renderMenu(MenuItem.TABLE);
   })
   .catch(() => {
     pointsModel.setPoints(UpdateType.INIT, []);
+    renderMenu(MenuItem.TABLE);
   });
