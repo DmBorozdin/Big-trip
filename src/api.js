@@ -1,4 +1,5 @@
 import PointsModel from './model/points.js';
+import { DataType } from './const.js';
 
 const Method = {
   GET: 'GET',
@@ -16,20 +17,13 @@ export default class Api {
     this._authorization = authorization;
   }
 
-  getPoints() {
-    return this._load({url: 'points'})
-      .then(Api.toJSON)
-      .then((points) => points.map(PointsModel.AdaptToClient));
-  }
+  getData(dataType) {
+    let data =  this._load({url: dataType}).then(Api.toJSON);
 
-  getOffers() {
-    return this._load({url: 'offers'})
-      .then(Api.toJSON);
-  }
-
-  getDestinations() {
-    return this._load({url: 'destinations'})
-      .then(Api.toJSON);
+    if (dataType === DataType.POINTS) {
+      data = data.then((points) => points.map(PointsModel.AdaptToClient));
+    }
+    return data;
   }
 
   updatePoint(point) {

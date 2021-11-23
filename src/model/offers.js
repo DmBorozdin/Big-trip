@@ -6,8 +6,10 @@ export default class Offers extends Observer {
     this._offers = [];
   }
 
-  setOffers(offers) {
+  setOffers(updateType, offers) {
     this._offers = offers.slice();
+
+    this._notify(updateType);
   }
 
   getAllOffers() {
@@ -15,6 +17,6 @@ export default class Offers extends Observer {
   }
 
   getOffersForType(type) {
-    return this._offers.find((offer) => offer.type === type).offers;
+    return this._offers.find((offer) => offer.type === type) !== undefined ? this._offers.find((offer) => offer.type === type).offers : [];
   }
 }

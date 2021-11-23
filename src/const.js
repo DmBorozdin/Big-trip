@@ -29,5 +29,13 @@ export const UpdateType = {
   PATCH: 'PATCH',
   MINOR: 'MINOR',
   MAJOR: 'MAJOR',
-  INIT: 'INIT',
+  INIT_POINT: 'INIT_POINT',
+  INIT_OFFERS: 'INIT_OFFERS',
+  INIT_DESTINATIONS: 'INIT_DESTINATIONS',
+};
+
+export const DataType = {
+  POINTS: 'points',
+  OFFERS: 'offers',
+  DESTINATIONS: 'destinations',
 };

@@ -18,7 +18,9 @@ export default class Trip {
     this._destinationsModel = destinationsModel;
     this._pointPresenter = {};
     this._currentSortType = AvailableSortType.DAY;
-    this._isLoading = true;
+    this._isLoadingPoints = true;
+    this._isLoadingOffers = true;
+    this._isLoadingDestinations = true;
     this._api = api;
 
     this._sortComponent = null;
@@ -39,6 +41,8 @@ export default class Trip {
 
     this._pointsModel.addObserver(this._handleModelEvent);
     this._filterModel.addObserver(this._handleModelEvent);
+    this._offersModel.addObserver(this._handleModelEvent);
+    this._destinationsModel.addObserver(this._handleModelEvent);
 
     this._renderTrip();
   }
@@ -51,6 +55,8 @@ export default class Trip {
 
     this._pointsModel.removeObserver(this._handleModelEvent);
     this._filterModel.removeObserver(this._handleModelEvent);
+    this._offersModel.removeObserver(this._handleModelEvent);
+    this._destinationsModel.removeObserver(this._handleModelEvent);
   }
 
   createPoint() {
@@ -108,9 +114,19 @@ export default class Trip {
         this._clearTripBoard({resetSortType: true});
         this._renderTrip();
         break;
-      case UpdateType.INIT:
-        this._isLoading = false;
+      case UpdateType.INIT_POINT:
+        this._isLoadingPoints = false;
         remove(this._loadingComponent);
+        this._renderTrip();
+        break;
+      case UpdateType.INIT_DESTINATIONS:
+        this._isLoadingDestinations = false;
+        this._destinations = this._destinationsModel.getAllDestinations();
+        this._renderTrip();
+        break;
+      case UpdateType.INIT_OFFERS:
+        this._isLoadingOffers = false;
+        this._offers = this._offersModel.getAllOffers();
         this._renderTrip();
         break;
     }
@@ -135,7 +151,7 @@ export default class Trip {
   }
 
   _renderPoint(point) {
-    const pointPresenter = new PointPresenter(this._tripListComponent, this._handleViewAction, this._handleModeChange, this._offersModel, this._destinationsModel);
+    const pointPresenter = new PointPresenter(this._tripListComponent, this._handleViewAction, this._handleModeChange, this._offers, this._destinations);
     pointPresenter.init(point);
     this._pointPresenter[point.id] = pointPresenter;
   }
@@ -167,7 +183,7 @@ export default class Trip {
   }
 
   _renderTrip() {
-    if (this._isLoading) {
+    if (this._isLoadingPoints || this._isLoadingDestinations || this._isLoadingOffers) {
       this._renderLoading();
       return;
     }
