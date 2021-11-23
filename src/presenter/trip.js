@@ -122,11 +122,13 @@ export default class Trip {
       case UpdateType.INIT_DESTINATIONS:
         this._isLoadingDestinations = false;
         this._destinations = this._destinationsModel.getAllDestinations();
+        remove(this._loadingComponent);
         this._renderTrip();
         break;
       case UpdateType.INIT_OFFERS:
         this._isLoadingOffers = false;
         this._offers = this._offersModel.getAllOffers();
+        remove(this._loadingComponent);
         this._renderTrip();
         break;
     }
