@@ -1,29 +1,31 @@
 import MenuView from './view/menu.js';
 import StatiscticsView from './view/statistics.js';
 import TripInfoPresenter from './presenter/trip-info.js';
-import { generatePoint, Destinations } from './mock/point.js';
 import TripPresenter from './presenter/trip.js';
 import FilterPresenter from './presenter/filter.js';
-import { OFFERS } from './const.js';
+import { UpdateType } from './const.js';
 import PointsModel from './model/points.js';
 import FilterModel from './model/filter.js';
 import OffersModel from './model/offers.js';
 import DestinationsModel from './model/destinations.js';
 import { render, RenderPosition, remove } from './utils/render.js';
-import { MenuItem } from './const.js';
+import { MenuItem, DataType } from './const.js';
+import Api from './api.js';
 
+const AUTHORIZATION = 'Basic dhul3j7s92gk0l';
+const END_POINT = 'https://14.ecmascript.pages.academy/big-trip';
 
-const POINT_COUNT = 10;
-const points = new Array(POINT_COUNT).fill(null).map(generatePoint);
+let isLoadingDestinations = false;
+let isLoadingOffers = false;
+
+const api = new Api(END_POINT, AUTHORIZATION);
+
 let previousMenuItem = null;
 
 const pointsModel = new PointsModel();
-pointsModel.setPoints(points);
 const filterModel = new FilterModel();
 const offersModel = new OffersModel();
-offersModel.setOffers(OFFERS);
 const destinationsModel = new DestinationsModel();
-destinationsModel.setDestinations(Destinations);
 
 const pageHeader = document.querySelector('.page-header');
 const tripMain = pageHeader.querySelector('.trip-main');
@@ -37,8 +39,10 @@ let renderMenu = null;
 let statisticsComponent = null;
 
 const tripInfoPresenter = new TripInfoPresenter(tripMain, pointsModel);
-const tripPresenter = new TripPresenter(tripEvent, pointsModel, filterModel, offersModel, destinationsModel);
+const tripPresenter = new TripPresenter(tripEvent, pointsModel, filterModel, offersModel, destinationsModel, api);
 const filterPresenter = new FilterPresenter(tripFilter, filterModel);
+
+newPointButton.disabled = true;
 
 const handleMenuClick = (menuItem) => {
   if (previousMenuItem === menuItem) {
@@ -48,7 +52,7 @@ const handleMenuClick = (menuItem) => {
     case MenuItem.TABLE:
       tripPresenter.init();
       remove(statisticsComponent);
-      newPointButton.disabled = false;
+      newPointButton.disabled = !isLoadingOffers || !isLoadingDestinations;
       renderMenu(MenuItem.TABLE);
       break;
     case MenuItem.STATS:
@@ -69,15 +73,41 @@ renderMenu = (currentMenuItem) => {
   menuComponent = new MenuView(currentMenuItem);
   render(tripNavigation, menuComponent, RenderPosition.BEFOREEND);
   menuComponent.setMenuClickHandler(handleMenuClick);
-};
 
-renderMenu(MenuItem.TABLE);
+  newPointButton.addEventListener('click', (evt) => {
+    evt.preventDefault();
+    tripPresenter.createPoint();
+  });
+};
 
 tripInfoPresenter.init();
 filterPresenter.init();
 tripPresenter.init();
 
-newPointButton.addEventListener('click', (evt) => {
-  evt.preventDefault();
-  tripPresenter.createPoint();
-});
+const setEnableNewPointButton = () => newPointButton.disabled = !isLoadingOffers || !isLoadingDestinations;
+
+api.getData(DataType.OFFERS)
+  .then((offers) => {
+    offersModel.setOffers(UpdateType.INIT_OFFERS, offers);
+    isLoadingOffers = true;
+    setEnableNewPointButton();
+  })
+  .catch(() => offersModel.setOffers(UpdateType.INIT_OFFERS, []));
+
+api.getData(DataType.DESTINATIONS)
+  .then((destinations) => {
+    destinationsModel.setDestinations(UpdateType.INIT_DESTINATIONS, destinations);
+    isLoadingDestinations = true;
+    setEnableNewPointButton();
+  })
+  .catch(() => destinationsModel.setDestinations(UpdateType.INIT_DESTINATIONS, []));
+
+api.getData(DataType.POINTS)
+  .then((points) => {
+    pointsModel.setPoints(UpdateType.INIT_POINT, points);
+    renderMenu(MenuItem.TABLE);
+  })
+  .catch(() => {
+    pointsModel.setPoints(UpdateType.INIT_POINT, []);
+    renderMenu(MenuItem.TABLE);
+  });
