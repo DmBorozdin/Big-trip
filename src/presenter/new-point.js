@@ -3,11 +3,12 @@ import { render, RenderPosition, remove} from '../utils/render.js';
 import { UserAction, UpdateType } from '../const.js';
 
 export default class PointNew {
-  constructor(tripListContainer, changeData, offers, destinations) {
+  constructor(tripListContainer, changeData, offers, destinations, setEnableNewPointButton) {
     this._tripListContainer = tripListContainer;
     this._changeData = changeData;
     this._offers = offers;
     this._destinations = destinations;
+    this._setEnableNewPointButton = setEnableNewPointButton;
 
     this._pointEditComponent = null;
 
@@ -46,6 +47,7 @@ export default class PointNew {
     if (evt.key === 'Escape' || evt.key === 'Esc') {
       evt.preventDefault();
       this.destroy();
+      this._setEnableNewPointButton();
     }
   }
 
@@ -74,9 +76,11 @@ export default class PointNew {
       UpdateType.MINOR,
       point,
     );
+    this._setEnableNewPointButton();
   }
 
   _handleCancelClick() {
     this.destroy();
+    this._setEnableNewPointButton();
   }
 }

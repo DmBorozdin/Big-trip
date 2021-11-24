@@ -10,7 +10,7 @@ import { filter } from '../utils/filter.js';
 import { AvailableSortType, UpdateType, UserAction, FilterType} from '../const.js';
 
 export default class Trip {
-  constructor(tripContainer, pointsModel, filterModel, offersModel, destinationsModel, api) {
+  constructor(tripContainer, pointsModel, filterModel, offersModel, destinationsModel, api, setEnableNewPointButton) {
     this._tripContainer = tripContainer;
     this._pointsModel = pointsModel;
     this._filterModel = filterModel;
@@ -22,6 +22,7 @@ export default class Trip {
     this._isLoadingOffers = true;
     this._isLoadingDestinations = true;
     this._api = api;
+    this._setEnableNewPointButton = setEnableNewPointButton;
 
     this._sortComponent = null;
     this._tripListComponent = new TripListView();
@@ -58,7 +59,7 @@ export default class Trip {
   }
 
   createPoint() {
-    this._newPointPresenter = new NewPointPresenter(this._tripListComponent, this._handleViewAction, this._offers, this._destinations);
+    this._newPointPresenter = new NewPointPresenter(this._tripListComponent, this._handleViewAction, this._offers, this._destinations, this._setEnableNewPointButton);
     this._currentSortType = AvailableSortType.DAY;
     this._filterModel.setFilter(UpdateType.MAJOR, FilterType.EVERYTHING);
     this._newPointPresenter.init();
@@ -86,6 +87,7 @@ export default class Trip {
       this._newPointPresenter.destroy();
     }
     Object.values(this._pointPresenter).forEach((presenter) => presenter.resetView());
+    this._setEnableNewPointButton();
   }
 
   _handleViewAction(actionType, updateType, update) {
