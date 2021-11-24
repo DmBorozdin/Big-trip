@@ -1,7 +1,7 @@
 import SortView from '../view/sort.js';
 import TripListView from '../view/trip-list.js';
 import EmptyListView from '../view/list-empty.js';
-import PointPresenter from './point.js';
+import PointPresenter, {State as PointPresenterViewState} from './point.js';
 import NewPointPresenter from './new-point.js';
 import LoadingView from '../view/loading.js';
 import { render, RenderPosition, remove} from '../utils/render.js';
@@ -91,13 +91,22 @@ export default class Trip {
   _handleViewAction(actionType, updateType, update) {
     switch(actionType) {
       case UserAction.UPDATE_POINT:
-        this._api.updatePoint(update).then((response) => this._pointsModel.updatePoint(updateType, response));
+        this._pointPresenter[update.id].setViewState(PointPresenterViewState.SAVING);
+        this._api.updatePoint(update)
+          .then((response) => this._pointsModel.updatePoint(updateType, response))
+          .catch(() => this._pointPresenter[update.id].setViewState(PointPresenterViewState.ABORTING));
         break;
       case UserAction.ADD_POINT:
-        this._api.addPoint(update).then((response) => this._pointsModel.addPoint(updateType, response));
+        this._newPointPresenter.setSaving();
+        this._api.addPoint(update)
+          .then((response) => this._pointsModel.addPoint(updateType, response))
+          .catch(() => this._newPointPresenter.setAborting());
         break;
       case UserAction.DELETE_POINT:
-        this._api.deletePoint(update).then(() => this._pointsModel.deletePoint(updateType, update));
+        this._pointPresenter[update.id].setViewState(PointPresenterViewState.DELETING);
+        this._api.deletePoint(update)
+          .then(() => this._pointsModel.deletePoint(updateType, update))
+          .catch(() => this._pointPresenter[update.id].setViewState(PointPresenterViewState.ABORTING));
         break;
     }
   }
@@ -172,7 +181,9 @@ export default class Trip {
   }
 
   _clearTripBoard({resetSortType = false} = {}) {
-    this._newPointPresenter.destroy();
+    if (this._newPointPresenter !== undefined) {
+      this._newPointPresenter.destroy();
+    }
     Object.values(this._pointPresenter).forEach((presenter) => presenter.destroy());
     this._pointPresenter = {};
 
