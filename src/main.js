@@ -38,11 +38,19 @@ let menuComponent = null;
 let renderMenu = null;
 let statisticsComponent = null;
 
+const setEnableNewPointButton = () => newPointButton.disabled = !isLoadingOffers || !isLoadingDestinations;
+
 const tripInfoPresenter = new TripInfoPresenter(tripMain, pointsModel);
-const tripPresenter = new TripPresenter(tripEvent, pointsModel, filterModel, offersModel, destinationsModel, api);
+const tripPresenter = new TripPresenter(tripEvent, pointsModel, filterModel, offersModel, destinationsModel, api, setEnableNewPointButton);
 const filterPresenter = new FilterPresenter(tripFilter, filterModel);
 
 newPointButton.disabled = true;
+
+newPointButton.addEventListener('click', (evt) => {
+  evt.preventDefault();
+  tripPresenter.createPoint();
+  newPointButton.disabled = true;
+});
 
 const handleMenuClick = (menuItem) => {
   if (previousMenuItem === menuItem) {
@@ -73,18 +81,11 @@ renderMenu = (currentMenuItem) => {
   menuComponent = new MenuView(currentMenuItem);
   render(tripNavigation, menuComponent, RenderPosition.BEFOREEND);
   menuComponent.setMenuClickHandler(handleMenuClick);
-
-  newPointButton.addEventListener('click', (evt) => {
-    evt.preventDefault();
-    tripPresenter.createPoint();
-  });
 };
 
 tripInfoPresenter.init();
 filterPresenter.init();
 tripPresenter.init();
-
-const setEnableNewPointButton = () => newPointButton.disabled = !isLoadingOffers || !isLoadingDestinations;
 
 api.getData(DataType.OFFERS)
   .then((offers) => {

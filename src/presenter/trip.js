@@ -1,7 +1,7 @@
 import SortView from '../view/sort.js';
 import TripListView from '../view/trip-list.js';
 import EmptyListView from '../view/list-empty.js';
-import PointPresenter from './point.js';
+import PointPresenter, {State as PointPresenterViewState} from './point.js';
 import NewPointPresenter from './new-point.js';
 import LoadingView from '../view/loading.js';
 import { render, RenderPosition, remove} from '../utils/render.js';
@@ -10,7 +10,7 @@ import { filter } from '../utils/filter.js';
 import { AvailableSortType, UpdateType, UserAction, FilterType} from '../const.js';
 
 export default class Trip {
-  constructor(tripContainer, pointsModel, filterModel, offersModel, destinationsModel, api) {
+  constructor(tripContainer, pointsModel, filterModel, offersModel, destinationsModel, api, setEnableNewPointButton) {
     this._tripContainer = tripContainer;
     this._pointsModel = pointsModel;
     this._filterModel = filterModel;
@@ -22,6 +22,7 @@ export default class Trip {
     this._isLoadingOffers = true;
     this._isLoadingDestinations = true;
     this._api = api;
+    this._setEnableNewPointButton = setEnableNewPointButton;
 
     this._sortComponent = null;
     this._tripListComponent = new TripListView();
@@ -32,8 +33,6 @@ export default class Trip {
     this._handleModelEvent = this._handleModelEvent.bind(this);
     this._handleModeChange = this._handleModeChange.bind(this);
     this._handleSortTypeChange = this._handleSortTypeChange.bind(this);
-
-    this._newPointPresenter = new NewPointPresenter(this._tripListComponent, this._handleViewAction, this._offersModel, this._destinationsModel);
   }
 
   init() {
@@ -60,6 +59,7 @@ export default class Trip {
   }
 
   createPoint() {
+    this._newPointPresenter = new NewPointPresenter(this._tripListComponent, this._handleViewAction, this._offers, this._destinations, this._setEnableNewPointButton);
     this._currentSortType = AvailableSortType.DAY;
     this._filterModel.setFilter(UpdateType.MAJOR, FilterType.EVERYTHING);
     this._newPointPresenter.init();
@@ -83,20 +83,32 @@ export default class Trip {
   }
 
   _handleModeChange() {
-    this._newPointPresenter.destroy();
+    if (this._newPointPresenter !== undefined) {
+      this._newPointPresenter.destroy();
+    }
     Object.values(this._pointPresenter).forEach((presenter) => presenter.resetView());
+    this._setEnableNewPointButton();
   }
 
   _handleViewAction(actionType, updateType, update) {
     switch(actionType) {
       case UserAction.UPDATE_POINT:
-        this._api.updatePoint(update).then((response) => this._pointsModel.updatePoint(updateType, response));
+        this._pointPresenter[update.id].setViewState(PointPresenterViewState.SAVING);
+        this._api.updatePoint(update)
+          .then((response) => this._pointsModel.updatePoint(updateType, response))
+          .catch(() => this._pointPresenter[update.id].setViewState(PointPresenterViewState.ABORTING));
         break;
       case UserAction.ADD_POINT:
-        this._pointsModel.addPoint(updateType, update);
+        this._newPointPresenter.setSaving();
+        this._api.addPoint(update)
+          .then((response) => this._pointsModel.addPoint(updateType, response))
+          .catch(() => this._newPointPresenter.setAborting());
         break;
       case UserAction.DELETE_POINT:
-        this._pointsModel.deletePoint(updateType, update);
+        this._pointPresenter[update.id].setViewState(PointPresenterViewState.DELETING);
+        this._api.deletePoint(update)
+          .then(() => this._pointsModel.deletePoint(updateType, update))
+          .catch(() => this._pointPresenter[update.id].setViewState(PointPresenterViewState.ABORTING));
         break;
     }
   }
@@ -171,7 +183,9 @@ export default class Trip {
   }
 
   _clearTripBoard({resetSortType = false} = {}) {
-    this._newPointPresenter.destroy();
+    if (this._newPointPresenter !== undefined) {
+      this._newPointPresenter.destroy();
+    }
     Object.values(this._pointPresenter).forEach((presenter) => presenter.destroy());
     this._pointPresenter = {};
 

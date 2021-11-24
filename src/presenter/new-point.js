@@ -1,14 +1,14 @@
 import PointEditView from '../view/point-edit.js';
-import { nanoid } from 'nanoid';
 import { render, RenderPosition, remove} from '../utils/render.js';
 import { UserAction, UpdateType } from '../const.js';
 
 export default class PointNew {
-  constructor(tripListContainer, changeData, offersModel, destinationsModel) {
+  constructor(tripListContainer, changeData, offers, destinations, setEnableNewPointButton) {
     this._tripListContainer = tripListContainer;
     this._changeData = changeData;
-    this._offersModel = offersModel;
-    this._destinationsModel = destinationsModel;
+    this._offers = offers;
+    this._destinations = destinations;
+    this._setEnableNewPointButton = setEnableNewPointButton;
 
     this._pointEditComponent = null;
 
@@ -22,7 +22,7 @@ export default class PointNew {
       return;
     }
 
-    this._pointEditComponent = new PointEditView(undefined, this._offersModel, this._destinationsModel, true);
+    this._pointEditComponent = new PointEditView(undefined, this._offers, this._destinations, true);
 
     this._pointEditComponent.setFormSubmitHandler(this._handleFormSubmit);
     this._pointEditComponent.setDeleteClickHandler(this._handleCancelClick);
@@ -47,19 +47,40 @@ export default class PointNew {
     if (evt.key === 'Escape' || evt.key === 'Esc') {
       evt.preventDefault();
       this.destroy();
+      this._setEnableNewPointButton();
     }
+  }
+
+  setSaving() {
+    this._pointEditComponent.updateData({
+      isDisabled: true,
+      isSaving: true,
+    });
+  }
+
+  setAborting() {
+    const resetFormState = () => {
+      this._pointEditComponent.updateData({
+        isDisabled: false,
+        isSaving: false,
+        isDeleting: false,
+      });
+    };
+
+    this._pointEditComponent.shake(resetFormState);
   }
 
   _handleFormSubmit(point) {
     this._changeData(
       UserAction.ADD_POINT,
       UpdateType.MINOR,
-      Object.assign({id: nanoid()}, point),
+      point,
     );
-    this.destroy();
+    this._setEnableNewPointButton();
   }
 
   _handleCancelClick() {
     this.destroy();
+    this._setEnableNewPointButton();
   }
 }
