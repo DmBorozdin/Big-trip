@@ -112,3 +112,7 @@ api.getData(DataType.POINTS)
     pointsModel.setPoints(UpdateType.INIT_POINT, []);
     renderMenu(MenuItem.TABLE);
   });
+
+window.addEventListener('load', () => {
+  navigator.serviceWorker.register('/sw.js');
+});
