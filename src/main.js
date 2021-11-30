@@ -9,16 +9,25 @@ import FilterModel from './model/filter.js';
 import OffersModel from './model/offers.js';
 import DestinationsModel from './model/destinations.js';
 import { render, RenderPosition, remove } from './utils/render.js';
+import { isOnline } from './utils/common.js';
+import { toast } from './utils/toast.js';
 import { MenuItem, DataType } from './const.js';
 import Api from './api/api.js';
+import Store from './api/store.js';
+import Provider from './api/provider.js';
 
 const AUTHORIZATION = 'Basic dhul3j7s92gk0l';
 const END_POINT = 'https://14.ecmascript.pages.academy/big-trip';
+const STORE_PREFIX = 'pointmanager-localstorage';
+const STORE_VER = 'v14';
+const STORE_NAME = `${STORE_PREFIX}-${STORE_VER}`;
 
 let isLoadingDestinations = false;
 let isLoadingOffers = false;
 
 const api = new Api(END_POINT, AUTHORIZATION);
+const store = new Store(STORE_NAME, window.localStorage);
+const apiWithProvider = new Provider(api, store);
 
 let previousMenuItem = null;
 
@@ -41,13 +50,17 @@ let statisticsComponent = null;
 const setEnableNewPointButton = () => newPointButton.disabled = !isLoadingOffers || !isLoadingDestinations;
 
 const tripInfoPresenter = new TripInfoPresenter(tripMain, pointsModel);
-const tripPresenter = new TripPresenter(tripEvent, pointsModel, filterModel, offersModel, destinationsModel, api, setEnableNewPointButton);
+const tripPresenter = new TripPresenter(tripEvent, pointsModel, filterModel, offersModel, destinationsModel, apiWithProvider, setEnableNewPointButton);
 const filterPresenter = new FilterPresenter(tripFilter, filterModel);
 
 newPointButton.disabled = true;
 
 newPointButton.addEventListener('click', (evt) => {
   evt.preventDefault();
+  if (!isOnline) {
+    toast('You can\'t create new point offline');
+    return;
+  }
   tripPresenter.createPoint();
   newPointButton.disabled = true;
 });
@@ -103,7 +116,7 @@ api.getData(DataType.DESTINATIONS)
   })
   .catch(() => destinationsModel.setDestinations(UpdateType.INIT_DESTINATIONS, []));
 
-api.getData(DataType.POINTS)
+apiWithProvider.getData(DataType.POINTS)
   .then((points) => {
     pointsModel.setPoints(UpdateType.INIT_POINT, points);
     renderMenu(MenuItem.TABLE);
@@ -115,4 +128,13 @@ api.getData(DataType.POINTS)
 
 window.addEventListener('load', () => {
   navigator.serviceWorker.register('/sw.js');
+});
+
+window.addEventListener('online', () => {
+  document.title = document.title.replace(' [offline]', '');
+  apiWithProvider.sync();
+});
+
+window.addEventListener('offline', () => {
+  document.title += ' [offline]';
 });
