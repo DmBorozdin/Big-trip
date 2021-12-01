@@ -135,7 +135,7 @@ export default class Point {
   }
 
   _handleExpandClick() {
-    if (!isOnline) {
+    if (!isOnline()) {
       toast('You can\'t edit point offline');
       return;
     }
@@ -152,7 +152,7 @@ export default class Point {
   }
 
   _handleFormSubmit(update) {
-    if (!isOnline) {
+    if (!isOnline()) {
       toast('You can\'t save point offline');
       return;
     }
@@ -170,7 +170,7 @@ export default class Point {
   }
 
   _handleDeleteClick(point) {
-    if (!isOnline) {
+    if (!isOnline()) {
       toast('You can\'t delete point offline');
       return;
     }

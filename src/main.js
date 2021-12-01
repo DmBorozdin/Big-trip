@@ -57,7 +57,7 @@ newPointButton.disabled = true;
 
 newPointButton.addEventListener('click', (evt) => {
   evt.preventDefault();
-  if (!isOnline) {
+  if (!isOnline()) {
     toast('You can\'t create new point offline');
     return;
   }
