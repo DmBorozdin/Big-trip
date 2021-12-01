@@ -137,6 +137,7 @@ export default class Point {
   _handleExpandClick() {
     if (!isOnline()) {
       toast('You can\'t edit point offline');
+      this.setViewState(State.ABORTING);
       return;
     }
 
@@ -154,6 +155,7 @@ export default class Point {
   _handleFormSubmit(update) {
     if (!isOnline()) {
       toast('You can\'t save point offline');
+      this.setViewState(State.ABORTING);
       return;
     }
     const isMinorUpdate = !isDatesEqual(this._point.dateFrom, update.dateFrom) || !isDatesEqual(this._point.dateTo, update.dateTo) || this._point.price !== update.price;
@@ -172,6 +174,7 @@ export default class Point {
   _handleDeleteClick(point) {
     if (!isOnline()) {
       toast('You can\'t delete point offline');
+      this.setViewState(State.ABORTING);
       return;
     }
     this._changeData(UserAction.DELETE_POINT, UpdateType.MINOR, point);
