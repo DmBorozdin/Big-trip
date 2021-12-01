@@ -1,6 +1,8 @@
 import PointEditView from '../view/point-edit.js';
 import { render, RenderPosition, remove} from '../utils/render.js';
 import { UserAction, UpdateType } from '../const.js';
+import { isOnline } from '../utils/common.js';
+import { toast } from '../utils/toast.js';
 
 export default class PointNew {
   constructor(tripListContainer, changeData, offers, destinations, setEnableNewPointButton) {
@@ -76,6 +78,10 @@ export default class PointNew {
       UpdateType.MINOR,
       point,
     );
+    if (!isOnline()) {
+      toast('You can\'t save point offline');
+      return;
+    }
     this._setEnableNewPointButton();
   }
 
