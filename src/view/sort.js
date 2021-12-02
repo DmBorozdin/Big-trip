@@ -1,10 +1,18 @@
-import { SORTS } from '../const.js';
+import { SortType } from '../const.js';
 import Abstract from './abstract.js';
 
 const createSortTemplate = (currentSortType) => `<form class="trip-events__trip-sort  trip-sort" action="#" method="get">
-  ${SORTS.map((sort) => `<div class="trip-sort__item  trip-sort__item--${sort}">
-  <input id="sort-day" class="trip-sort__input  visually-hidden" type="radio" name="trip-sort" value="sort-${sort}" ${sort === currentSortType ? 'checked' : ''} ${sort==='event' || sort==='offer' ? 'disabled' : ''}>
-  <label class="trip-sort__btn" for="sort-${sort}">${sort === 'offer' ? `${sort}s` : sort}</label>
+  ${Object.values(SortType).map((sort) => `<div class="trip-sort__item  trip-sort__item--${sort}">
+  <input
+    id="sort-day"
+    class="trip-sort__input  visually-hidden"
+    type="radio"
+    name="trip-sort"
+    value="sort-${sort}"
+    ${sort === currentSortType ? 'checked' : ''}
+    ${sort === SortType.EVENT || sort === SortType.OFFERS ? 'disabled' : ''}
+  >
+  <label class="trip-sort__btn" for="sort-${sort}">${sort}</label>
 </div>`).join('')}
 </form>`;
 
@@ -21,12 +29,12 @@ export default class Sort extends Abstract {
   }
 
   _sortTypeChangeHandler(evt) {
-    if(evt.target.tagName !=='LABEL') {
+    const selectedSortType = evt.target.htmlFor.slice(5);
+    if(evt.target.tagName !=='LABEL' || selectedSortType === SortType.EVENT || selectedSortType === SortType.OFFERS) {
       return;
     }
-
     evt.preventDefault();
-    this._callback.sortTypeChange(evt.target.htmlFor.slice(5));
+    this._callback.sortTypeChange(selectedSortType);
   }
 
   setSortTypeChangeHandler(callback) {

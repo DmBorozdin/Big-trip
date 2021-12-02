@@ -51,7 +51,7 @@ const setEnableNewPointButton = () => newPointButton.disabled = !isLoadingOffers
 
 const tripInfoPresenter = new TripInfoPresenter(tripMain, pointsModel);
 const tripPresenter = new TripPresenter(tripEvent, pointsModel, filterModel, offersModel, destinationsModel, apiWithProvider, setEnableNewPointButton);
-const filterPresenter = new FilterPresenter(tripFilter, filterModel);
+const filterPresenter = new FilterPresenter(tripFilter, filterModel, pointsModel);
 
 newPointButton.disabled = true;
 
