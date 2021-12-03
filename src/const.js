@@ -6,12 +6,12 @@ export const FilterType = {
   PAST: 'past',
 };
 
-export const SORTS = ['day', 'event', 'time', 'price', 'offer'];
-
-export const AvailableSortType = {
+export const SortType = {
   DAY: 'day',
+  EVENT: 'event',
   TIME: 'time',
   PRICE: 'price',
+  OFFERS: 'offers',
 };
 
 export const MenuItem = {

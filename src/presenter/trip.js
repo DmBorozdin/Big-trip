@@ -7,7 +7,7 @@ import LoadingView from '../view/loading.js';
 import { render, RenderPosition, remove} from '../utils/render.js';
 import { sortPointByDay, sortPointByPrice, sortPointByDuration } from '../utils/point.js';
 import { filter } from '../utils/filter.js';
-import { AvailableSortType, UpdateType, UserAction, FilterType} from '../const.js';
+import { SortType, UpdateType, UserAction, FilterType} from '../const.js';
 
 export default class Trip {
   constructor(tripContainer, pointsModel, filterModel, offersModel, destinationsModel, api, setEnableNewPointButton) {
@@ -17,7 +17,7 @@ export default class Trip {
     this._offersModel = offersModel;
     this._destinationsModel = destinationsModel;
     this._pointPresenter = {};
-    this._currentSortType = AvailableSortType.DAY;
+    this._currentSortType = SortType.DAY;
     this._isLoadingPoints = true;
     this._isLoadingOffers = true;
     this._isLoadingDestinations = true;
@@ -60,7 +60,7 @@ export default class Trip {
 
   createPoint() {
     this._newPointPresenter = new NewPointPresenter(this._tripListComponent, this._handleViewAction, this._offers, this._destinations, this._setEnableNewPointButton);
-    this._currentSortType = AvailableSortType.DAY;
+    this._currentSortType = SortType.DAY;
     this._filterModel.setFilter(UpdateType.MAJOR, FilterType.EVERYTHING);
     this._newPointPresenter.init();
   }
@@ -71,11 +71,11 @@ export default class Trip {
     const filteredPoints = filter[filterType](points);
 
     switch(this._currentSortType) {
-      case AvailableSortType.DAY:
+      case SortType.DAY:
         return filteredPoints.sort(sortPointByDay);
-      case AvailableSortType.PRICE:
+      case SortType.PRICE:
         return filteredPoints.sort(sortPointByPrice);
-      case AvailableSortType.TIME:
+      case SortType.TIME:
         return filteredPoints.sort(sortPointByDuration);
     }
 
@@ -194,7 +194,7 @@ export default class Trip {
     remove(this._loadingComponent);
 
     if (resetSortType) {
-      this._currentSortType = AvailableSortType.DAY;
+      this._currentSortType = SortType.DAY;
     }
   }
 
