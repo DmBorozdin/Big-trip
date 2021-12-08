@@ -26,13 +26,14 @@ export default class Trip {
 
     this._sortComponent = null;
     this._tripListComponent = new TripListView();
-    this._emptyListComponent = new EmptyListView();
+    this._emptyListComponent = null;
     this._loadingComponent = new LoadingView();
 
     this._handleViewAction = this._handleViewAction.bind(this);
     this._handleModelEvent = this._handleModelEvent.bind(this);
     this._handleModeChange = this._handleModeChange.bind(this);
     this._handleSortTypeChange = this._handleSortTypeChange.bind(this);
+    this._renderEmptyList = this._renderEmptyList.bind(this);
   }
 
   init() {
@@ -59,10 +60,11 @@ export default class Trip {
   }
 
   createPoint() {
-    this._newPointPresenter = new NewPointPresenter(this._tripListComponent, this._handleViewAction, this._offers, this._destinations, this._setEnableNewPointButton);
+    this._newPointPresenter = new NewPointPresenter(this._tripListComponent, this._handleViewAction, this._offers, this._destinations, this._setEnableNewPointButton, this._renderEmptyList);
     this._currentSortType = SortType.DAY;
     this._filterModel.setFilter(UpdateType.MAJOR, FilterType.EVERYTHING);
     this._newPointPresenter.init();
+    remove(this._emptyListComponent);
   }
 
   _getPoints() {
@@ -119,8 +121,7 @@ export default class Trip {
         this._pointPresenter[data.id].init(data);
         break;
       case UpdateType.MINOR:
-        this._clearTripBoard();
-        this._renderTrip();
+        this._resetTripBoard();
         break;
       case UpdateType.MAJOR:
         this._clearTripBoard({resetSortType: true});
@@ -151,8 +152,7 @@ export default class Trip {
       return;
     }
     this._currentSortType = sortType;
-    this._clearTripBoard();
-    this._renderTrip();
+    this._resetTripBoard();
   }
 
   _renderSort() {
@@ -179,7 +179,11 @@ export default class Trip {
   }
 
   _renderEmptyList() {
-    render(this._tripContainer, new EmptyListView(), RenderPosition.BEFOREEND);
+    if ( this._emptyListComponent !== null) {
+      this._emptyListComponent = null;
+    }
+    this._emptyListComponent = new EmptyListView();
+    render(this._tripContainer, this._emptyListComponent, RenderPosition.BEFOREEND);
   }
 
   _clearTripBoard({resetSortType = false} = {}) {
@@ -211,5 +215,10 @@ export default class Trip {
     }
     this._renderSort();
     this._renderPoints(points);
+  }
+
+  _resetTripBoard() {
+    this._clearTripBoard();
+    this._renderTrip();
   }
 }

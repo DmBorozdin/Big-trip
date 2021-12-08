@@ -5,12 +5,13 @@ import { isOnline } from '../utils/common.js';
 import { toast } from '../utils/toast.js';
 
 export default class PointNew {
-  constructor(tripListContainer, changeData, offers, destinations, setEnableNewPointButton) {
+  constructor(tripListContainer, changeData, offers, destinations, setEnableNewPointButton, renderEmptyList) {
     this._tripListContainer = tripListContainer;
     this._changeData = changeData;
     this._offers = offers;
     this._destinations = destinations;
     this._setEnableNewPointButton = setEnableNewPointButton;
+    this._renderEmptyList = renderEmptyList;
 
     this._pointEditComponent = null;
 
@@ -50,6 +51,7 @@ export default class PointNew {
       evt.preventDefault();
       this.destroy();
       this._setEnableNewPointButton();
+      this._renderEmptyList();
     }
   }
 
@@ -88,5 +90,6 @@ export default class PointNew {
   _handleCancelClick() {
     this.destroy();
     this._setEnableNewPointButton();
+    this._renderEmptyList();
   }
 }
